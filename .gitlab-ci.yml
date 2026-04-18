@@ -1,212 +1,142 @@
 # ============================================================
 # RakuOS KDE Image — GitLab CI/CD Pipeline
 # ============================================================
-# Builds two OCI image variants (base, nvidia) using buildah,
-# pulling from the RakuOS base images in the GitLab Container
-# Registry, and pushes results to this project's registry.
-# Build and push happen in the same job — buildah's local image
-# store is ephemeral and does not persist across separate jobs.
-# ============================================================
 
 variables:
-  # Registry for this project's output images
   IMAGE_REGISTRY: "registry.gitlab.com/rakuos/images/rakuos-kde"
-  # nvidia variant lives under a sub-path of this project's registry
-  # so the built-in CI_REGISTRY_USER / CI_REGISTRY_PASSWORD work for both
   IMAGE_REGISTRY_NVIDIA: "registry.gitlab.com/rakuos/images/rakuos-kde/nvidia"
-  # Base images produced by rakuos-base — pulled during buildah build
-  BASE_REGISTRY: "registry.gitlab.com/rakuos/images/rakuos-base"
-  BASE_REGISTRY_NVIDIA: "registry.gitlab.com/rakuos/images/rakuos-base/nvidia"
+  DEFAULT_TAG: "latest"
   IMAGE_DESC: "RakuOS KDE"
   IMAGE_KEYWORDS: "bootc,fedora,atomic,kde,plasma"
-  # Default tag applied to images built from the main branch
-  DEFAULT_TAG: "latest"
 
 stages:
   - build-push
-  # - sign      # Uncomment when Cosign keys are configured
-  # - dispatch  # Uncomment when downstream trigger tokens are configured
 
-# ============================================================
-# Hidden base job — shared config for all buildah jobs
-# ============================================================
-# Runs in the official buildah image which ships with all
-# tools needed to build OCI images without a Docker daemon.
 .buildah-job:
   image: quay.io/buildah/stable:latest
   tags:
     - saas-linux-medium-amd64
   before_script:
-    # Resolve which base image tag to pull, mirroring the branch logic
-    # used in rakuos-base:
-    #   main    → latest  (pulls the stable base image)
-    #   staging → staging (pulls the staging base image)
-    #   other   → <branch-slug>
     - |
-      if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]]; then
+      if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
         export BASE_IMAGE_TAG="${DEFAULT_TAG}"
       else
-        export BASE_IMAGE_TAG=$(echo "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')
+        export BASE_IMAGE_TAG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')"
       fi
       echo "Pulling base image tag: ${BASE_IMAGE_TAG}"
-    # Compute a date-stamped tag (e.g. latest.20260417)
-    - export DATE_TAG=$(date -u +%Y%m%d)
+    - export DATE_TAG="$(date -u +%Y%m%d)"
   variables:
-    # Allow buildah to use overlayfs storage inside the runner
     STORAGE_DRIVER: overlay
     BUILDAH_FORMAT: docker
 
-# ============================================================
-# STAGE: build-push
-# ============================================================
-# Build and push happen in the same job so the image built by
-# buildah is still present in the local store when we push.
-#
-# On MR pipelines: build only (no push) — validates the image
-# builds correctly without publishing anything.
-# On main/staging: build then immediately push.
-
-# Build (and push) the standard KDE image
 build-push-base:
   extends: .buildah-job
   stage: build-push
   script:
-    # Compute output image tags based on branch:
-    #   main    → latest, latest.YYYYMMDD, YYYYMMDD
-    #   staging → staging, staging.YYYYMMDD
-    #   other   → <branch-slug>, <branch-slug>.YYYYMMDD
+    - printf 'TAGS=\nBRANCH_SLUG=\n' > build-base.env
+
     - |
-      if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]]; then
+      if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
         TAGS="${IMAGE_REGISTRY}:${DEFAULT_TAG} ${IMAGE_REGISTRY}:${DEFAULT_TAG}.${DATE_TAG} ${IMAGE_REGISTRY}:${DATE_TAG}"
+        BRANCH_SLUG="${DEFAULT_TAG}"
       else
-        BRANCH_SLUG=$(echo "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')
+        BRANCH_SLUG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')"
         TAGS="${IMAGE_REGISTRY}:${BRANCH_SLUG} ${IMAGE_REGISTRY}:${BRANCH_SLUG}.${DATE_TAG}"
       fi
-    # Log in before build so buildah can pull the base image from the
-    # GitLab registry (registry.gitlab.com/rakuos/images/rakuos-base)
+      export TAGS BRANCH_SLUG
+      printf 'TAGS=%s\nBRANCH_SLUG=%s\n' "${TAGS}" "${BRANCH_SLUG}" > build-base.env
+
     - buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
+
+    - export TEMP_TAG="${IMAGE_REGISTRY}:ci-temp-${CI_PIPELINE_ID}"
+
     - |
       buildah build \
         --file Containerfile \
-        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
+        --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
         --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         --label "org.opencontainers.image.description=${IMAGE_DESC}" \
         --label "org.opencontainers.image.source=${CI_PROJECT_URL}" \
         --label "org.opencontainers.image.revision=${CI_COMMIT_SHA}" \
         --label "org.opencontainers.image.vendor=RakuOS" \
+        --label "org.opencontainers.image.keywords=${IMAGE_KEYWORDS}" \
         --label "containers.bootc=1" \
-        $(for t in $TAGS; do echo "--tag $t"; done) \
+        --tag "${TEMP_TAG}" \
         .
-    # Push immediately after build while the image is still in the local store.
-    # Skipped on MR pipelines — we only validate the build, never publish.
+
     - |
-      if [[ "${CI_PIPELINE_SOURCE}" != "merge_request_event" ]]; then
+      for tag in ${TAGS}; do
+        echo "Tagging ${TEMP_TAG} as ${tag}"
+        buildah tag "${TEMP_TAG}" "${tag}"
+      done
+
+    - |
+      if [ "${CI_PIPELINE_SOURCE}" != "merge_request_event" ]; then
         for tag in ${TAGS}; do
           echo "Pushing ${tag}"
           buildah push "${tag}"
         done
       fi
-    # Export tags for downstream sign/dispatch stages
-    - echo "TAGS=${TAGS}" > build-base.env
-    - echo "BRANCH_SLUG=${BRANCH_SLUG:-${DEFAULT_TAG}}" >> build-base.env
   artifacts:
-    # Pass computed tags to future sign/dispatch jobs
     reports:
       dotenv: build-base.env
   rules:
-    # Run on MRs (build-only validation) and on main/staging (build + push)
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_BRANCH == "staging"'
 
-# Build (and push) the nvidia KDE variant.
-# Pulls from rakuos-base/nvidia and pushes to this project's /nvidia sub-path
-# so the built-in CI_REGISTRY_USER / CI_REGISTRY_PASSWORD credentials work.
 build-push-nvidia:
   extends: .buildah-job
   stage: build-push
   script:
+    - printf 'TAGS_NVIDIA=\nBRANCH_SLUG=\n' > build-nvidia.env
+
     - |
-      if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]]; then
+      if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
         TAGS="${IMAGE_REGISTRY_NVIDIA}:${DEFAULT_TAG} ${IMAGE_REGISTRY_NVIDIA}:${DEFAULT_TAG}.${DATE_TAG} ${IMAGE_REGISTRY_NVIDIA}:${DATE_TAG}"
+        BRANCH_SLUG="${DEFAULT_TAG}"
       else
-        BRANCH_SLUG=$(echo "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')
+        BRANCH_SLUG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')"
         TAGS="${IMAGE_REGISTRY_NVIDIA}:${BRANCH_SLUG} ${IMAGE_REGISTRY_NVIDIA}:${BRANCH_SLUG}.${DATE_TAG}"
       fi
-    # Log in before build so buildah can pull the nvidia base image
+      export TAGS BRANCH_SLUG
+      printf 'TAGS_NVIDIA=%s\nBRANCH_SLUG=%s\n' "${TAGS}" "${BRANCH_SLUG}" > build-nvidia.env
+
     - buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
+
+    - export TEMP_TAG="${IMAGE_REGISTRY_NVIDIA}:ci-temp-${CI_PIPELINE_ID}"
+
     - |
       buildah build \
         --file Containerfile.nvidia \
-        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
+        --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
         --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         --label "org.opencontainers.image.description=${IMAGE_DESC} (NVIDIA)" \
         --label "org.opencontainers.image.source=${CI_PROJECT_URL}" \
         --label "org.opencontainers.image.revision=${CI_COMMIT_SHA}" \
         --label "org.opencontainers.image.vendor=RakuOS" \
+        --label "org.opencontainers.image.keywords=${IMAGE_KEYWORDS}" \
         --label "containers.bootc=1" \
-        $(for t in $TAGS; do echo "--tag $t"; done) \
+        --tag "${TEMP_TAG}" \
         .
-    # Push immediately after build while the image is still in the local store.
-    # Skipped on MR pipelines — we only validate the build, never publish.
+
     - |
-      if [[ "${CI_PIPELINE_SOURCE}" != "merge_request_event" ]]; then
+      for tag in ${TAGS}; do
+        echo "Tagging ${TEMP_TAG} as ${tag}"
+        buildah tag "${TEMP_TAG}" "${tag}"
+      done
+
+    - |
+      if [ "${CI_PIPELINE_SOURCE}" != "merge_request_event" ]; then
         for tag in ${TAGS}; do
           echo "Pushing ${tag}"
           buildah push "${tag}"
         done
       fi
-    # Export nvidia tags for downstream sign/dispatch stages
-    - echo "TAGS_NVIDIA=${TAGS}" > build-nvidia.env
-    - echo "BRANCH_SLUG=${BRANCH_SLUG:-${DEFAULT_TAG}}" >> build-nvidia.env
   artifacts:
-    # Pass computed nvidia tags to future sign/dispatch jobs
     reports:
       dotenv: build-nvidia.env
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_BRANCH == "staging"'
-
-# ============================================================
-# STAGE: sign  (COMMENTED OUT — enable after Cosign setup)
-# ============================================================
-# To enable:
-#   1. Generate a Cosign key pair: cosign generate-key-pair
-#   2. Add COSIGN_PRIVATE_KEY and COSIGN_PASSWORD as
-#      masked CI/CD variables in Settings → CI/CD → Variables
-#   3. Uncomment the 'sign' stage above and these two jobs
-#
-# sign-base:
-#   stage: sign
-#   image: cgr.dev/chainguard/cosign:latest
-#   needs:
-#     - job: build-push-base
-#       artifacts: true
-#   script:
-#     - |
-#       for tag in ${TAGS}; do
-#         cosign sign -y --key env://COSIGN_PRIVATE_KEY "${tag}"
-#       done
-#   variables:
-#     COSIGN_EXPERIMENTAL: "false"
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-#     - if: '$CI_COMMIT_BRANCH == "staging"'
-#
-# sign-nvidia:
-#   stage: sign
-#   image: cgr.dev/chainguard/cosign:latest
-#   needs:
-#     - job: build-push-nvidia
-#       artifacts: true
-#   script:
-#     - |
-#       for tag in ${TAGS_NVIDIA}; do
-#         cosign sign -y --key env://COSIGN_PRIVATE_KEY "${tag}"
-#       done
-#   variables:
-#     COSIGN_EXPERIMENTAL: "false"
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-#     - if: '$CI_COMMIT_BRANCH == "staging"'
