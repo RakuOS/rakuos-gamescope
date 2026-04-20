@@ -31,23 +31,29 @@ stages:
     - |
       case "${CI_COMMIT_BRANCH}" in
         "${CI_DEFAULT_BRANCH}")
+          export FEDORA_VERSION="43"
           export BRANCH_SLUG="${DEFAULT_TAG}"
           ;;
         "staging")
+          export FEDORA_VERSION="44"
           export BRANCH_SLUG="staging"
           ;;
         "rawhide")
+          export FEDORA_VERSION="rawhide"
           export BRANCH_SLUG="rawhide"
           ;;
         "rakuosel")
+          # Temporary until this branch switches to the CentOS Stream flow.
+          export FEDORA_VERSION="44"
           export BRANCH_SLUG="rakuosel"
           ;;
         *)
+          export FEDORA_VERSION="44"
           export BRANCH_SLUG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')"
           ;;
       esac
-      export BASE_IMAGE_TAG="${BRANCH_SLUG}"
-      echo "Pulling base image tag: ${BASE_IMAGE_TAG}"
+      echo "Building with FEDORA_VERSION=${FEDORA_VERSION}"
+      echo "Using branch slug: ${BRANCH_SLUG}"
     - export DATE_TAG="$(date -u +%Y%m%d)"
   variables:
     STORAGE_DRIVER: overlay
