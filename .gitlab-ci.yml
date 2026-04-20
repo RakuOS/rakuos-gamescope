@@ -22,6 +22,7 @@ variables:
 
 stages:
   - build-push
+  - dispatch
 
 .buildah-job:
   image: quay.io/buildah/stable:latest
@@ -74,14 +75,12 @@ build-push-base:
       export TAGS BRANCH_SLUG
       printf 'TAGS=%s\nBRANCH_SLUG=%s\n' "${TAGS}" "${BRANCH_SLUG}" > build-base.env
 
-    - buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
-
     - export TEMP_TAG="${IMAGE_REGISTRY}:ci-temp-${CI_PIPELINE_ID}"
 
     - |
       buildah build \
         --file Containerfile \
-        --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
+        --build-arg FEDORA_VERSION="${FEDORA_VERSION}" \
         --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         --label "org.opencontainers.image.description=${IMAGE_DESC}" \
         --label "org.opencontainers.image.source=${CI_PROJECT_URL}" \
@@ -100,6 +99,7 @@ build-push-base:
 
     - |
       if [ "${CI_PIPELINE_SOURCE}" != "merge_request_event" ]; then
+        buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
         for tag in ${TAGS}; do
           echo "Pushing ${tag}"
           buildah push "${tag}"
@@ -130,14 +130,12 @@ build-push-nvidia:
       export TAGS BRANCH_SLUG
       printf 'TAGS_NVIDIA=%s\nBRANCH_SLUG=%s\n' "${TAGS}" "${BRANCH_SLUG}" > build-nvidia.env
 
-    - buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
-
     - export TEMP_TAG="${IMAGE_REGISTRY_NVIDIA}:ci-temp-${CI_PIPELINE_ID}"
 
     - |
       buildah build \
         --file Containerfile.nvidia \
-        --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
+        --build-arg FEDORA_VERSION="${FEDORA_VERSION}" \
         --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         --label "org.opencontainers.image.description=${IMAGE_DESC} (NVIDIA)" \
         --label "org.opencontainers.image.source=${CI_PROJECT_URL}" \
@@ -156,6 +154,7 @@ build-push-nvidia:
 
     - |
       if [ "${CI_PIPELINE_SOURCE}" != "merge_request_event" ]; then
+        buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
         for tag in ${TAGS}; do
           echo "Pushing ${tag}"
           buildah push "${tag}"
