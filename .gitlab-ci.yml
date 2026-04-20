@@ -29,11 +29,24 @@ stages:
     - saas-linux-medium-amd64
   before_script:
     - |
-      if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
-        export BASE_IMAGE_TAG="${DEFAULT_TAG}"
-      else
-        export BASE_IMAGE_TAG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')"
-      fi
+      case "${CI_COMMIT_BRANCH}" in
+        "${CI_DEFAULT_BRANCH}")
+          export BRANCH_SLUG="${DEFAULT_TAG}"
+          ;;
+        "staging")
+          export BRANCH_SLUG="staging"
+          ;;
+        "rawhide")
+          export BRANCH_SLUG="rawhide"
+          ;;
+        "rakuosel")
+          export BRANCH_SLUG="rakuosel"
+          ;;
+        *)
+          export BRANCH_SLUG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')"
+          ;;
+      esac
+      export BASE_IMAGE_TAG="${BRANCH_SLUG}"
       echo "Pulling base image tag: ${BASE_IMAGE_TAG}"
     - export DATE_TAG="$(date -u +%Y%m%d)"
   variables:
@@ -49,9 +62,7 @@ build-push-base:
     - |
       if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
         TAGS="${IMAGE_REGISTRY}:${DEFAULT_TAG} ${IMAGE_REGISTRY}:${DEFAULT_TAG}.${DATE_TAG} ${IMAGE_REGISTRY}:${DATE_TAG}"
-        BRANCH_SLUG="${DEFAULT_TAG}"
       else
-        BRANCH_SLUG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')"
         TAGS="${IMAGE_REGISTRY}:${BRANCH_SLUG} ${IMAGE_REGISTRY}:${BRANCH_SLUG}.${DATE_TAG}"
       fi
       export TAGS BRANCH_SLUG
@@ -95,6 +106,8 @@ build-push-base:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_BRANCH == "staging"'
+    - if: '$CI_COMMIT_BRANCH == "rawhide"'
+    - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
 build-push-nvidia:
   extends: .buildah-job
@@ -105,9 +118,7 @@ build-push-nvidia:
     - |
       if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
         TAGS="${IMAGE_REGISTRY_NVIDIA}:${DEFAULT_TAG} ${IMAGE_REGISTRY_NVIDIA}:${DEFAULT_TAG}.${DATE_TAG} ${IMAGE_REGISTRY_NVIDIA}:${DATE_TAG}"
-        BRANCH_SLUG="${DEFAULT_TAG}"
       else
-        BRANCH_SLUG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')"
         TAGS="${IMAGE_REGISTRY_NVIDIA}:${BRANCH_SLUG} ${IMAGE_REGISTRY_NVIDIA}:${BRANCH_SLUG}.${DATE_TAG}"
       fi
       export TAGS BRANCH_SLUG
@@ -151,3 +162,5 @@ build-push-nvidia:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_BRANCH == "staging"'
+    - if: '$CI_COMMIT_BRANCH == "rawhide"'
+    - if: '$CI_COMMIT_BRANCH == "rakuosel"'
