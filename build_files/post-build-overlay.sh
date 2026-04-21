@@ -5,7 +5,8 @@
 # Does NOT install packages — that's impossible inside a container build
 # because overlayfs on /usr requires CAP_SYS_ADMIN and a real kernel mount.
 #
-# Instead, this script seeds /var/lib/rakuos/ into a "post-reset" state:
+# Instead, this script seeds /usr/share/factory/var/lib/rakuos/ so the first
+# deployed system gets a populated /var/lib/rakuos/ state:
 #   - packages.list populated from /usr/share/rakuos/packages.list
 #   - overlay upper/work dirs created and empty
 #   - overlay.state intentionally absent
@@ -20,17 +21,102 @@
 set -euo pipefail
 
 DEFAULT_PACKAGES_LIST="/usr/share/rakuos/packages.list"
-PACKAGES_LIST="/var/lib/rakuos/packages.list"
-UPPER_DIR="/var/lib/rakuos/overlay/upper"
-WORK_DIR="/var/lib/rakuos/overlay/work"
-STATE_FILE="/var/lib/rakuos/overlay.state"
-DIRTY_FILE="/var/lib/rakuos/overlay.dirty"
+Dnf_CONF="/usr/share/rakuos/dnf.conf"
+FACTORY_VAR_ROOT="/usr/share/factory/var"
+PACKAGES_LIST="$FACTORY_VAR_ROOT/lib/rakuos/packages.list"
+UPPER_DIR="$FACTORY_VAR_ROOT/lib/rakuos/overlay/upper"
+WORK_DIR="$FACTORY_VAR_ROOT/lib/rakuos/overlay/work"
+STATE_FILE="$FACTORY_VAR_ROOT/lib/rakuos/overlay.state"
+DIRTY_FILE="$FACTORY_VAR_ROOT/lib/rakuos/overlay.dirty"
+PKG_CACHE_DIR="$FACTORY_VAR_ROOT/cache/libdnf5"
+PKGCACHE_MIGRATED="$FACTORY_VAR_ROOT/lib/rakuos/pkgcache.migrated"
+BASE_RPM_DB="/usr/share/rpm"
+IMAGE_PACKAGES_TOML="/usr/lib/sysimage/libdnf5/packages.toml"
 
 echo "[rakuos] Seeding overlay state for first-boot install..."
 
+prebake_overlay_from_installroot() {
+    local dnf_conf="/usr/share/rakuos/dnf.conf"
+    local releasever=""
+    local installroot
+    local -a prebake_packages=()
+
+    if [[ ! -f "$dnf_conf" ]]; then
+        echo "[rakuos] WARNING: Missing $dnf_conf; skipping overlay prebake."
+        return 0
+    fi
+
+    if [[ -f /etc/os-release ]]; then
+        # shellcheck disable=SC1091
+        . /etc/os-release
+        releasever="${VERSION_ID:-}"
+    fi
+    if [[ -z "$releasever" ]]; then
+        echo "[rakuos] WARNING: Could not determine releasever; skipping overlay prebake."
+        return 0
+    fi
+
+    mapfile -t prebake_packages < <(
+        grep -v '^\s*#' "$PACKAGES_LIST" \
+        | grep -v '^\s*$' \
+        | sed 's/\s*#.*//' \
+        | tr -s ' \t' '\n' \
+        | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' \
+        | grep -v '^$'
+    )
+
+    if [[ ${#prebake_packages[@]} -eq 0 ]]; then
+        echo "[rakuos] No overlay packages listed; skipping prebake."
+        return 0
+    fi
+
+    installroot="$(mktemp -d /var/tmp/rakuos-overlay-installroot.XXXXXX)"
+    trap 'rm -rf "$installroot"' RETURN
+
+    echo "[rakuos] Prebaking overlay packages into installroot..."
+    mkdir -p "$installroot/var/cache/libdnf5"
+    mkdir -p "$installroot/usr/share/rpm"
+    cp -a "$BASE_RPM_DB/." "$installroot/usr/share/rpm/"
+    rm -f "$installroot/usr/share/rpm"/.rpm.lock "$installroot/usr/share/rpm"/__db.*
+    if [[ -f "$IMAGE_PACKAGES_TOML" ]]; then
+        mkdir -p "$installroot/usr/lib/sysimage/libdnf5"
+        cp -a "$IMAGE_PACKAGES_TOML" "$installroot/usr/lib/sysimage/libdnf5/packages.toml"
+    fi
+
+    dnf5.real --config="$dnf_conf" \
+        --use-host-config \
+        --installroot="$installroot" \
+        --releasever="$releasever" \
+        --setopt=keepcache=1 \
+        --setopt=cachedir="$installroot/var/cache/libdnf5" \
+        --setopt=tsflags=noscripts \
+        install -y --refresh "${prebake_packages[@]}"
+
+    echo "[rakuos] Copying prebaked /usr payload into overlay upper..."
+    rm -rf "$UPPER_DIR" "$WORK_DIR" "$PKG_CACHE_DIR"
+    mkdir -p "$UPPER_DIR" "$WORK_DIR" "$PKG_CACHE_DIR"
+    cp -a "$installroot/usr/." "$UPPER_DIR/"
+
+    if [[ -d "$installroot/etc" ]] && [[ -n "$(ls -A "$installroot/etc" 2>/dev/null)" ]]; then
+        echo "[rakuos] Copying prebaked /etc payload into image..."
+        cp -a "$installroot/etc/." /etc/
+    fi
+
+    if [[ -d "$installroot/var/cache/libdnf5" ]] && [[ -n "$(ls -A "$installroot/var/cache/libdnf5" 2>/dev/null)" ]]; then
+        echo "[rakuos] Copying libdnf5 cache into image..."
+        cp -a "$installroot/var/cache/libdnf5/." "$PKG_CACHE_DIR/"
+    fi
+
+    touch "$PKGCACHE_MIGRATED"
+    echo "prebaked-installroot" > "$STATE_FILE"
+    rm -f "$DIRTY_FILE"
+
+    echo "[rakuos] Overlay prebake complete."
+}
+
 # ── Create runtime dirs ───────────────────────────────────────────────────────
 
-mkdir -p /var/lib/rakuos
+mkdir -p "$FACTORY_VAR_ROOT/lib/rakuos"
 mkdir -p "$UPPER_DIR"
 mkdir -p "$WORK_DIR"
 
@@ -54,7 +140,7 @@ rm -f "$STATE_FILE"
 rm -f "$DIRTY_FILE"
 
 # Ensure packages.list ends with newline
-sed -i -e '$a\' /var/lib/rakuos/packages.list
+sed -i -e '$a\' "$PACKAGES_LIST"
 
 echo "[rakuos] overlay.state cleared — first boot will install all packages."
 echo "[rakuos] Post-build seed complete."
@@ -90,3 +176,6 @@ EOF
 
 echo "Generating base file manifest..."
 /usr/libexec/rakuos/generate-base-manifest
+
+echo "Prebaking KDE overlay payload..."
+prebake_overlay_from_installroot
