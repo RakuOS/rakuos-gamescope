@@ -96,6 +96,9 @@ prebake_overlay_from_installroot() {
     rm -rf "$UPPER_DIR" "$WORK_DIR" "$PKG_CACHE_DIR"
     mkdir -p "$UPPER_DIR" "$WORK_DIR" "$PKG_CACHE_DIR"
     cp -a "$installroot/usr/." "$UPPER_DIR/"
+    mkdir -p "$UPPER_DIR/share/rpm"
+    cp -a "$installroot/usr/share/rpm/." "$UPPER_DIR/share/rpm/"
+    rm -f "$UPPER_DIR/share/rpm"/.rpm.lock "$UPPER_DIR/share/rpm"/__db.*
 
     if [[ -d "$installroot/etc" ]] && [[ -n "$(ls -A "$installroot/etc" 2>/dev/null)" ]]; then
         echo "[rakuos] Copying prebaked /etc payload into image..."
@@ -132,17 +135,13 @@ else
     touch "$PACKAGES_LIST"
 fi
 
-# ── Ensure state is absent (triggers full install on first boot) ──────────────
-# overlay-sync treats a missing STATE_FILE as "fresh/reset" and performs
-# a full install of everything in packages.list.
-
-rm -f "$STATE_FILE"
-rm -f "$DIRTY_FILE"
+# ── Ensure stale state is cleared before prebake writes fresh state ───────────
+rm -f "$STATE_FILE" "$DIRTY_FILE"
 
 # Ensure packages.list ends with newline
 sed -i -e '$a\' "$PACKAGES_LIST"
 
-echo "[rakuos] overlay.state cleared — first boot will install all packages."
+echo "[rakuos] stale overlay state cleared — prebake will write fresh first-boot state."
 echo "[rakuos] Post-build seed complete."
 
 echo "Appending KDE protected packages to protected-packages.txt..."
