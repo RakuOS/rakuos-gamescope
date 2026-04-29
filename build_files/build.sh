@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -ouex pipefail
-FEDORA_VERSION=$(rpm -E %fedora)
+CENTOS_VERSION=$(rpm -E %rhel)
 
 ## Install packages
 dnf5.real -y install @fonts @hardware-support \
@@ -10,7 +10,7 @@ dnf5.real -y install @fonts @hardware-support \
   plasma-workspace-wayland \
   plasma-browser-integration \
   kscreen \
-  plasma-login-manager \
+  sddm \
   kwin \
   kmenuedit \
   kinfocenter \
@@ -35,10 +35,6 @@ dnf5.real -y remove plasma-discover \
   plasma-welcome \
   plasma-welcome-fedora
 
-## Remove Fedora Look and Feel
-rm -rf /usr/share/plasma/look-and-feel/org.fedoraproject.fedora.desktop
-rm -rf /usr/share/plasma/look-and-feel/org.fedoraproject.fedoradark.desktop
-rm -rf /usr/share/plasma/look-and-feel/org.fedoraproject.fedoralight.desktop
 
 ## Remove Fedora Wallpapers
 rm /usr/share/wallpapers/Fedora
@@ -48,4 +44,4 @@ rm -rf /usr/share/wallpapers/F43
 sed -i '$r /usr/share/plasma/shells/org.kde.plasma.desktop/contents/updates/rakuos-pins.js' /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js
 
 ## Enable Services
-systemctl enable plasmalogin.service
+systemctl enable sddm.service
