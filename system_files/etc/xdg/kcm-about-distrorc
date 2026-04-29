@@ -1,8 +1,8 @@
 [General]
 LogoPath=rakuos-logo
-Name=RakuOS Linux
-Version=43
-Variant=KDE Plasma Atomic Desktop
+Name=RakuOS Enterprise Linux
+Version=10
+Variant=KDE Plasma Atomic Workstation
 Website=https://rakuos.org
 BugReportUrl=https://github.com/RakuOS
 SupportUrl=https://rakuos.org/forum
