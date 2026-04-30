@@ -20,6 +20,11 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/build.sh && /ctx/post-build.sh && /ctx/post-build-overlay.sh
 
+RUN if [ -d /usr/etc ]; then \
+      cp -a /usr/etc/. /etc/ && \
+      rm -rf /usr/etc; \
+    fi
+
 ### LINTING
 ## Verify final image and contents are correct.
 RUN bootc container lint
