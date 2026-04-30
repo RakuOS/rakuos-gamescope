@@ -25,6 +25,7 @@ dnf5.real -y install @fonts @hardware-support \
   kde-gtk-config \
   kcm_systemd \
   kwalletmanager5 \
+  plasma-foreground-booster-dmemcg \
   rakuos-welcome-qt \
   rakuos-software-qt
 
