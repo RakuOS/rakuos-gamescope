@@ -26,7 +26,6 @@ variables:
 stages:
   - build
   - test-iso
-  - trigger
   - push
   - cleanup
   - dispatch
@@ -153,12 +152,15 @@ build-nvidia:
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
 # ============================================================
-# ISO Build Tests
+# ISO Build Tests + Immediate Failure Response
 # ============================================================
 # Requires group CI/CD variables:
 #   BASE_PROJECT_ID     — numeric GitLab project ID of rakuos-base
 #   TRIGGER_TOKEN_BASE  — pipeline trigger token for rakuos-base
-#   GITLAB_API_TOKEN    — read-only token for dedup API check
+#   GITLAB_API_TOKEN    — api-scoped token for dedup check + pipeline cancellation
+#   GNOME_PROJECT_ID    — numeric GitLab project ID of rakuos-gnome
+#   KDE_PROJECT_ID      — numeric GitLab project ID of rakuos-kde
+#   COSMIC_PROJECT_ID   — numeric GitLab project ID of rakuos-cosmic
 
 .iso-test-job:
   image: quay.io/fedora/fedora:latest
@@ -240,8 +242,8 @@ test-iso-nvidia:
       just -f rakuos-forge/Justfile build "${IMAGE_REF}" 1 none squashfs NONE "${IMAGE_REF}" 1
       echo "ISO build succeeded."
 
-trigger-base-rebuild:
-  stage: trigger
+.trigger-on-fail:
+  stage: test-iso
   image: quay.io/fedora/fedora:latest
   tags:
     - saas-linux-small-amd64
@@ -250,18 +252,36 @@ trigger-base-rebuild:
     - |
       set -euo pipefail
       dnf install -y curl jq
-      if [[ -z "${GITLAB_API_TOKEN:-}" ]] || [[ -z "${BASE_PROJECT_ID:-}" ]]; then
-        echo "GITLAB_API_TOKEN or BASE_PROJECT_ID not set — skipping dedup check, triggering rebuild."
-      else
-        CUTOFF="$(date -u -d '20 minutes ago' +%Y-%m-%dT%H:%M:%SZ)"
-        RECENT=$(curl -sf \
-          --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
-          "https://gitlab.com/api/v4/projects/${BASE_PROJECT_ID}/pipelines?ref=${CI_COMMIT_BRANCH}&updated_after=${CUTOFF}&per_page=5" \
-          | jq 'length')
-        if [ "${RECENT}" -gt 0 ]; then
-          echo "Base rebuild already triggered recently (${RECENT} pipeline(s) found for branch ${CI_COMMIT_BRANCH}). Skipping."
-          exit 0
+      cancel_sibling() {
+        local proj_id="$1"
+        local proj_name="$2"
+        if [ "${proj_id}" = "${CI_PROJECT_ID}" ]; then
+          return 0
         fi
+        for STATUS in running pending; do
+          PIDS=$(curl -sf \
+            --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+            "https://gitlab.com/api/v4/projects/${proj_id}/pipelines?ref=${CI_COMMIT_BRANCH}&status=${STATUS}&per_page=5" \
+            | grep -o '"id":[0-9]*' | grep -o '[0-9]*' || true)
+          for PID in ${PIDS}; do
+            echo "Cancelling ${proj_name} pipeline ${PID} (${STATUS}) on ${CI_COMMIT_BRANCH}..."
+            curl -sf -X POST \
+              --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+              "https://gitlab.com/api/v4/projects/${proj_id}/pipelines/${PID}/cancel" || true
+          done
+        done
+      }
+      cancel_sibling "${GNOME_PROJECT_ID}"  "rakuos-gnome"
+      cancel_sibling "${KDE_PROJECT_ID}"    "rakuos-kde"
+      cancel_sibling "${COSMIC_PROJECT_ID}" "rakuos-cosmic"
+      CUTOFF="$(date -u -d '20 minutes ago' +%Y-%m-%dT%H:%M:%SZ)"
+      RECENT=$(curl -sf \
+        --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+        "https://gitlab.com/api/v4/projects/${BASE_PROJECT_ID}/pipelines?ref=${CI_COMMIT_BRANCH}&updated_after=${CUTOFF}&per_page=5" \
+        | jq 'length')
+      if [ "${RECENT}" -gt 0 ]; then
+        echo "Base rebuild already triggered recently (${RECENT} pipeline(s)). Skipping."
+        exit 0
       fi
       echo "Triggering base rebuild on rakuos-base/${CI_COMMIT_BRANCH}..."
       curl -sf -X POST \
@@ -280,6 +300,18 @@ trigger-base-rebuild:
       when: on_failure
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
       when: on_failure
+
+trigger-on-iso-standard-fail:
+  extends: .trigger-on-fail
+  needs:
+    - job: test-iso-standard
+      artifacts: false
+
+trigger-on-iso-nvidia-fail:
+  extends: .trigger-on-fail
+  needs:
+    - job: test-iso-nvidia
+      artifacts: false
 
 push-tags-base:
   stage: push
