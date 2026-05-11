@@ -19,9 +19,16 @@ variables:
   DEFAULT_TAG: "latest"
   IMAGE_DESC: "RakuOS KDE"
   IMAGE_KEYWORDS: "bootc,fedora,atomic,kde,plasma"
+  TITANOBOA_REPO: "https://gitlab.com/rakuos/iso/rakuos-forge.git"
+  TITANOBOA_REF: "main"
+  ISO_CONFIG_REPO: "https://gitlab.com/rakuos/iso/rakuos-kde-iso.git"
 
 stages:
-  - build-push
+  - build
+  - test-iso
+  - trigger
+  - push
+  - cleanup
   - dispatch
 
 .buildah-job:
@@ -55,12 +62,10 @@ stages:
     STORAGE_DRIVER: overlay
     BUILDAH_FORMAT: docker
 
-build-push-base:
+build-base:
   extends: .buildah-job
-  stage: build-push
+  stage: build
   script:
-    - printf 'TAGS=\nBRANCH_SLUG=\n' > build-base.env
-
     - |
       if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
         TAGS="${IMAGE_REGISTRY}:${DEFAULT_TAG} ${IMAGE_REGISTRY}:${DEFAULT_TAG}.${DATE_TAG} ${IMAGE_REGISTRY}:${DATE_TAG}"
@@ -87,18 +92,10 @@ build-push-base:
         .
 
     - |
-      for tag in ${TAGS}; do
-        echo "Tagging ${TEMP_TAG} as ${tag}"
-        buildah tag "${TEMP_TAG}" "${tag}"
-      done
-
-    - |
       if [ "${CI_PIPELINE_SOURCE}" != "merge_request_event" ]; then
         buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
-        for tag in ${TAGS}; do
-          echo "Pushing ${tag}"
-          buildah push "${tag}"
-        done
+        echo "Pushing temporary image ${TEMP_TAG}..."
+        buildah push "${TEMP_TAG}"
       fi
   artifacts:
     reports:
@@ -110,12 +107,10 @@ build-push-base:
     - if: '$CI_COMMIT_BRANCH == "rawhide"'
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
-build-push-nvidia:
+build-nvidia:
   extends: .buildah-job
-  stage: build-push
+  stage: build
   script:
-    - printf 'TAGS_NVIDIA=\nBRANCH_SLUG=\n' > build-nvidia.env
-
     - |
       if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
         TAGS="${IMAGE_REGISTRY_NVIDIA}:${DEFAULT_TAG} ${IMAGE_REGISTRY_NVIDIA}:${DEFAULT_TAG}.${DATE_TAG} ${IMAGE_REGISTRY_NVIDIA}:${DATE_TAG}"
@@ -142,18 +137,10 @@ build-push-nvidia:
         .
 
     - |
-      for tag in ${TAGS}; do
-        echo "Tagging ${TEMP_TAG} as ${tag}"
-        buildah tag "${TEMP_TAG}" "${tag}"
-      done
-
-    - |
       if [ "${CI_PIPELINE_SOURCE}" != "merge_request_event" ]; then
         buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
-        for tag in ${TAGS}; do
-          echo "Pushing ${tag}"
-          buildah push "${tag}"
-        done
+        echo "Pushing temporary image ${TEMP_TAG}..."
+        buildah push "${TEMP_TAG}"
       fi
   artifacts:
     reports:
@@ -164,3 +151,236 @@ build-push-nvidia:
     - if: '$CI_COMMIT_BRANCH == "staging"'
     - if: '$CI_COMMIT_BRANCH == "rawhide"'
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
+
+# ============================================================
+# ISO Build Tests
+# ============================================================
+# Requires group CI/CD variables:
+#   BASE_PROJECT_ID     — numeric GitLab project ID of rakuos-base
+#   TRIGGER_TOKEN_BASE  — pipeline trigger token for rakuos-base
+#   GITLAB_API_TOKEN    — read-only token for dedup API check
+
+.iso-test-job:
+  image: quay.io/fedora/fedora:latest
+  tags:
+    - saas-linux-2xlarge-amd64
+  timeout: 75 minutes
+  before_script:
+    - |
+      set -euo pipefail
+      dnf install -y \
+        git \
+        just \
+        podman \
+        jq \
+        curl \
+        findutils \
+        tar \
+        xorriso \
+        dosfstools \
+        grub2 \
+        grub2-efi \
+        grub2-tools \
+        grub2-tools-extra \
+        grub2-efi-x64 \
+        grub2-efi-x64-cdboot \
+        grub2-efi-x64-modules \
+        shim \
+        squashfs-tools \
+        erofs-utils \
+        policycoreutils
+      case "${CI_COMMIT_BRANCH}" in
+        "${CI_DEFAULT_BRANCH}") export BRANCH_SLUG="latest"    ;;
+        "staging")              export BRANCH_SLUG="staging"   ;;
+        "rawhide")              export BRANCH_SLUG="rawhide"   ;;
+        "rakuosel")             export BRANCH_SLUG="rakuosel"  ;;
+        *)                      export BRANCH_SLUG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')" ;;
+      esac
+      git clone --depth 1 --branch "${TITANOBOA_REF}" "${TITANOBOA_REPO}" rakuos-forge
+      git clone --depth 1 "${ISO_CONFIG_REPO}" iso-config
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+    - if: '$CI_COMMIT_BRANCH == "rawhide"'
+    - if: '$CI_COMMIT_BRANCH == "rakuosel"'
+
+test-iso-standard:
+  extends: .iso-test-job
+  stage: test-iso
+  needs:
+    - job: build-base
+      artifacts: false
+  script:
+    - |
+      set -euo pipefail
+      export IMAGE_REF="${IMAGE_REGISTRY}:ci-temp-${CI_PIPELINE_ID}"
+      export TITANOBOA_BUILDER_DISTRO="fedora"
+      export HOOK_post_rootfs="${CI_PROJECT_DIR}/iso-config/config/configure-iso.sh"
+      export HOOK_pre_initramfs="${CI_PROJECT_DIR}/iso-config/config/pre_initramfs.sh"
+      echo "Testing ISO build for ${IMAGE_REF}..."
+      just -f rakuos-forge/Justfile build "${IMAGE_REF}" 1 none squashfs NONE "${IMAGE_REF}" 1
+      echo "ISO build succeeded."
+
+test-iso-nvidia:
+  extends: .iso-test-job
+  stage: test-iso
+  needs:
+    - job: build-nvidia
+      artifacts: false
+  script:
+    - |
+      set -euo pipefail
+      export IMAGE_REF="${IMAGE_REGISTRY_NVIDIA}:ci-temp-${CI_PIPELINE_ID}"
+      export TITANOBOA_BUILDER_DISTRO="fedora"
+      export HOOK_post_rootfs="${CI_PROJECT_DIR}/iso-config/config/configure-iso.sh"
+      export HOOK_pre_initramfs="${CI_PROJECT_DIR}/iso-config/config/pre_initramfs.sh"
+      echo "Testing ISO build for ${IMAGE_REF}..."
+      just -f rakuos-forge/Justfile build "${IMAGE_REF}" 1 none squashfs NONE "${IMAGE_REF}" 1
+      echo "ISO build succeeded."
+
+trigger-base-rebuild:
+  stage: trigger
+  image: quay.io/fedora/fedora:latest
+  tags:
+    - saas-linux-small-amd64
+  allow_failure: true
+  script:
+    - |
+      set -euo pipefail
+      dnf install -y curl jq
+      if [[ -z "${GITLAB_API_TOKEN:-}" ]] || [[ -z "${BASE_PROJECT_ID:-}" ]]; then
+        echo "GITLAB_API_TOKEN or BASE_PROJECT_ID not set — skipping dedup check, triggering rebuild."
+      else
+        CUTOFF="$(date -u -d '20 minutes ago' +%Y-%m-%dT%H:%M:%SZ)"
+        RECENT=$(curl -sf \
+          --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+          "https://gitlab.com/api/v4/projects/${BASE_PROJECT_ID}/pipelines?ref=${CI_COMMIT_BRANCH}&updated_after=${CUTOFF}&per_page=5" \
+          | jq 'length')
+        if [ "${RECENT}" -gt 0 ]; then
+          echo "Base rebuild already triggered recently (${RECENT} pipeline(s) found for branch ${CI_COMMIT_BRANCH}). Skipping."
+          exit 0
+        fi
+      fi
+      echo "Triggering base rebuild on rakuos-base/${CI_COMMIT_BRANCH}..."
+      curl -sf -X POST \
+        --form "token=${TRIGGER_TOKEN_BASE}" \
+        --form "ref=${CI_COMMIT_BRANCH}" \
+        "https://gitlab.com/api/v4/projects/${BASE_PROJECT_ID}/trigger/pipeline"
+      echo "Base rebuild triggered."
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: on_failure
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+      when: on_failure
+    - if: '$CI_COMMIT_BRANCH == "rawhide"'
+      when: on_failure
+    - if: '$CI_COMMIT_BRANCH == "rakuosel"'
+      when: on_failure
+
+push-tags-base:
+  stage: push
+  image: quay.io/skopeo/stable:latest
+  tags:
+    - saas-linux-small-amd64
+  needs:
+    - job: test-iso-standard
+      artifacts: false
+  script:
+    - |
+      set -euo pipefail
+      case "${CI_COMMIT_BRANCH}" in
+        "${CI_DEFAULT_BRANCH}") BRANCH_SLUG="${DEFAULT_TAG}" ;;
+        "staging")              BRANCH_SLUG="staging"        ;;
+        "rawhide")              BRANCH_SLUG="rawhide"        ;;
+        "rakuosel")             BRANCH_SLUG="rakuosel"       ;;
+        *)                      BRANCH_SLUG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')" ;;
+      esac
+      DATE_TAG="$(date -u +%Y%m%d)"
+      TEMP_SRC="docker://${IMAGE_REGISTRY}:ci-temp-${CI_PIPELINE_ID}"
+      skopeo login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
+      if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
+        FINAL_TAGS="${IMAGE_REGISTRY}:${DEFAULT_TAG} ${IMAGE_REGISTRY}:${DEFAULT_TAG}.${DATE_TAG} ${IMAGE_REGISTRY}:${DATE_TAG}"
+      else
+        FINAL_TAGS="${IMAGE_REGISTRY}:${BRANCH_SLUG} ${IMAGE_REGISTRY}:${BRANCH_SLUG}.${DATE_TAG}"
+      fi
+      for tag in ${FINAL_TAGS}; do
+        echo "Pushing ${tag}..."
+        skopeo copy "${TEMP_SRC}" "docker://${tag}"
+      done
+      echo "All final tags pushed."
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+    - if: '$CI_COMMIT_BRANCH == "rawhide"'
+    - if: '$CI_COMMIT_BRANCH == "rakuosel"'
+
+push-tags-nvidia:
+  stage: push
+  image: quay.io/skopeo/stable:latest
+  tags:
+    - saas-linux-small-amd64
+  needs:
+    - job: test-iso-nvidia
+      artifacts: false
+  script:
+    - |
+      set -euo pipefail
+      case "${CI_COMMIT_BRANCH}" in
+        "${CI_DEFAULT_BRANCH}") BRANCH_SLUG="${DEFAULT_TAG}" ;;
+        "staging")              BRANCH_SLUG="staging"        ;;
+        "rawhide")              BRANCH_SLUG="rawhide"        ;;
+        "rakuosel")             BRANCH_SLUG="rakuosel"       ;;
+        *)                      BRANCH_SLUG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')" ;;
+      esac
+      DATE_TAG="$(date -u +%Y%m%d)"
+      TEMP_SRC="docker://${IMAGE_REGISTRY_NVIDIA}:ci-temp-${CI_PIPELINE_ID}"
+      skopeo login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
+      if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
+        FINAL_TAGS="${IMAGE_REGISTRY_NVIDIA}:${DEFAULT_TAG} ${IMAGE_REGISTRY_NVIDIA}:${DEFAULT_TAG}.${DATE_TAG} ${IMAGE_REGISTRY_NVIDIA}:${DATE_TAG}"
+      else
+        FINAL_TAGS="${IMAGE_REGISTRY_NVIDIA}:${BRANCH_SLUG} ${IMAGE_REGISTRY_NVIDIA}:${BRANCH_SLUG}.${DATE_TAG}"
+      fi
+      for tag in ${FINAL_TAGS}; do
+        echo "Pushing ${tag}..."
+        skopeo copy "${TEMP_SRC}" "docker://${tag}"
+      done
+      echo "All final tags pushed."
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+    - if: '$CI_COMMIT_BRANCH == "rawhide"'
+    - if: '$CI_COMMIT_BRANCH == "rakuosel"'
+
+cleanup-temp-tags:
+  stage: cleanup
+  image: quay.io/skopeo/stable:latest
+  tags:
+    - saas-linux-small-amd64
+  when: always
+  script:
+    - |
+      set -euo pipefail
+      skopeo login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
+      echo "Deleting temp tags for pipeline ${CI_PIPELINE_ID}..."
+      skopeo delete "docker://${IMAGE_REGISTRY}:ci-temp-${CI_PIPELINE_ID}" || true
+      skopeo delete "docker://${IMAGE_REGISTRY_NVIDIA}:ci-temp-${CI_PIPELINE_ID}" || true
+      echo "Temp tag cleanup complete."
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "rawhide"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "rakuosel"'
+      when: always
