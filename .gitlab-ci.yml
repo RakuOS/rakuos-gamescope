@@ -302,8 +302,9 @@ push-tags-base:
         *)                      BRANCH_SLUG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')" ;;
       esac
       DATE_TAG="$(date -u +%Y%m%d)"
-      TEMP_SRC="docker://${IMAGE_REGISTRY}:ci-temp-${CI_PIPELINE_ID}"
-      skopeo login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
+      TEMP_TAG="${IMAGE_REGISTRY}:ci-temp-${CI_PIPELINE_ID}"
+      buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
+      buildah pull "docker://${TEMP_TAG}"
       if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
         FINAL_TAGS="${IMAGE_REGISTRY}:${DEFAULT_TAG} ${IMAGE_REGISTRY}:${DEFAULT_TAG}.${DATE_TAG} ${IMAGE_REGISTRY}:${DATE_TAG}"
       else
@@ -311,7 +312,7 @@ push-tags-base:
       fi
       for tag in ${FINAL_TAGS}; do
         echo "Pushing ${tag}..."
-        skopeo copy "${TEMP_SRC}" "docker://${tag}"
+        buildah push "${TEMP_TAG}" "docker://${tag}"
       done
       echo "All final tags pushed."
   rules:
@@ -343,8 +344,9 @@ push-tags-nvidia:
         *)                      BRANCH_SLUG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')" ;;
       esac
       DATE_TAG="$(date -u +%Y%m%d)"
-      TEMP_SRC="docker://${IMAGE_REGISTRY_NVIDIA}:ci-temp-${CI_PIPELINE_ID}"
-      skopeo login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
+      TEMP_TAG="${IMAGE_REGISTRY_NVIDIA}:ci-temp-${CI_PIPELINE_ID}"
+      buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
+      buildah pull "docker://${TEMP_TAG}"
       if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
         FINAL_TAGS="${IMAGE_REGISTRY_NVIDIA}:${DEFAULT_TAG} ${IMAGE_REGISTRY_NVIDIA}:${DEFAULT_TAG}.${DATE_TAG} ${IMAGE_REGISTRY_NVIDIA}:${DATE_TAG}"
       else
@@ -352,7 +354,7 @@ push-tags-nvidia:
       fi
       for tag in ${FINAL_TAGS}; do
         echo "Pushing ${tag}..."
-        skopeo copy "${TEMP_SRC}" "docker://${tag}"
+        buildah push "${TEMP_TAG}" "docker://${tag}"
       done
       echo "All final tags pushed."
   rules:
@@ -372,10 +374,16 @@ cleanup-temp-tags:
   script:
     - |
       set -euo pipefail
-      skopeo login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
+      buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
       echo "Deleting temp tags for pipeline ${CI_PIPELINE_ID}..."
-      skopeo delete "docker://${IMAGE_REGISTRY}:ci-temp-${CI_PIPELINE_ID}" || true
-      skopeo delete "docker://${IMAGE_REGISTRY_NVIDIA}:ci-temp-${CI_PIPELINE_ID}" || true
+      TEMP_TAG_NAME="ci-temp-${CI_PIPELINE_ID}"
+      REPOS=$(curl -sf --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+        "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/registry/repositories?per_page=20")
+      for REPO_ID in $(echo "${REPOS}" | grep -o '"id":[0-9]*' | grep -o '[0-9]*'); do
+        curl -sf -X DELETE \
+          --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+          "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/registry/repositories/${REPO_ID}/tags/${TEMP_TAG_NAME}" || true
+      done
       echo "Temp tag cleanup complete."
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
