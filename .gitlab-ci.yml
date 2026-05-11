@@ -283,7 +283,7 @@ trigger-base-rebuild:
 
 push-tags-base:
   stage: push
-  image: quay.io/skopeo/stable:latest
+  image: quay.io/buildah/stable:latest
   tags:
     - saas-linux-small-amd64
   needs:
@@ -324,7 +324,7 @@ push-tags-base:
 
 push-tags-nvidia:
   stage: push
-  image: quay.io/skopeo/stable:latest
+  image: quay.io/buildah/stable:latest
   tags:
     - saas-linux-small-amd64
   needs:
@@ -365,7 +365,7 @@ push-tags-nvidia:
 
 cleanup-temp-tags:
   stage: cleanup
-  image: quay.io/skopeo/stable:latest
+  image: quay.io/buildah/stable:latest
   tags:
     - saas-linux-small-amd64
   when: always
