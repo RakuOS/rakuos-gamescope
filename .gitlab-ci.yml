@@ -289,6 +289,10 @@ test-iso-nvidia:
         --form "ref=${CI_COMMIT_BRANCH}" \
         "https://gitlab.com/api/v4/projects/${BASE_PROJECT_ID}/trigger/pipeline"
       echo "Base rebuild triggered."
+      echo "Cancelling own pipeline ${CI_PIPELINE_ID}..."
+      curl -sf -X POST \
+        --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+        "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}/cancel" || true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: never
