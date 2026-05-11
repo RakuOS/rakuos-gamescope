@@ -289,6 +289,8 @@ push-tags-base:
   needs:
     - job: test-iso-standard
       artifacts: false
+    - job: test-iso-nvidia
+      artifacts: false
   script:
     - |
       set -euo pipefail
@@ -326,6 +328,8 @@ push-tags-nvidia:
   tags:
     - saas-linux-small-amd64
   needs:
+    - job: test-iso-standard
+      artifacts: false
     - job: test-iso-nvidia
       artifacts: false
   script:
