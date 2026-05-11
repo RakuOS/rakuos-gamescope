@@ -151,6 +151,91 @@ build-nvidia:
     - if: '$CI_COMMIT_BRANCH == "rawhide"'
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
+.trigger-on-build-fail:
+  stage: build
+  image: quay.io/fedora/fedora:latest
+  tags:
+    - saas-linux-small-amd64
+  allow_failure: true
+  script:
+    - |
+      set -euo pipefail
+      dnf install -y curl jq
+      echo "Cleaning up temp tags for pipeline ${CI_PIPELINE_ID}..."
+      TEMP_TAG_NAME="ci-temp-${CI_PIPELINE_ID}"
+      REPOS=$(curl -sf --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+        "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/registry/repositories?per_page=20")
+      for REPO_ID in $(echo "${REPOS}" | grep -o '"id":[0-9]*' | grep -o '[0-9]*'); do
+        curl -sf -X DELETE \
+          --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+          "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/registry/repositories/${REPO_ID}/tags/${TEMP_TAG_NAME}" || true
+      done
+      echo "Temp tag cleanup complete."
+      cancel_sibling() {
+        local proj_id="$1"
+        local proj_name="$2"
+        if [ "${proj_id}" = "${CI_PROJECT_ID}" ]; then
+          return 0
+        fi
+        for STATUS in running pending; do
+          PIDS=$(curl -sf \
+            --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+            "https://gitlab.com/api/v4/projects/${proj_id}/pipelines?ref=${CI_COMMIT_BRANCH}&status=${STATUS}&per_page=5" \
+            | grep -o '"id":[0-9]*' | grep -o '[0-9]*' || true)
+          for PID in ${PIDS}; do
+            echo "Cancelling ${proj_name} pipeline ${PID} (${STATUS}) on ${CI_COMMIT_BRANCH}..."
+            curl -sf -X POST \
+              --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+              "https://gitlab.com/api/v4/projects/${proj_id}/pipelines/${PID}/cancel" || true
+          done
+        done
+      }
+      cancel_sibling "${GNOME_PROJECT_ID}"  "rakuos-gnome"
+      cancel_sibling "${KDE_PROJECT_ID}"    "rakuos-kde"
+      cancel_sibling "${COSMIC_PROJECT_ID}" "rakuos-cosmic"
+      CUTOFF="$(date -u -d '20 minutes ago' +%Y-%m-%dT%H:%M:%SZ)"
+      RECENT=$(curl -sf \
+        --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+        "https://gitlab.com/api/v4/projects/${BASE_PROJECT_ID}/pipelines?ref=${CI_COMMIT_BRANCH}&updated_after=${CUTOFF}&per_page=5" \
+        | jq 'length')
+      if [ "${RECENT}" -gt 0 ]; then
+        echo "Base rebuild already triggered recently (${RECENT} pipeline(s)). Skipping."
+      else
+        echo "Triggering base rebuild on rakuos-base/${CI_COMMIT_BRANCH}..."
+        curl -sf -X POST \
+          --form "token=${TRIGGER_TOKEN_BASE}" \
+          --form "ref=${CI_COMMIT_BRANCH}" \
+          "https://gitlab.com/api/v4/projects/${BASE_PROJECT_ID}/trigger/pipeline"
+        echo "Base rebuild triggered."
+      fi
+      echo "Cancelling own pipeline ${CI_PIPELINE_ID}..."
+      curl -sf -X POST \
+        --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+        "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}/cancel" || true
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: on_failure
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+      when: on_failure
+    - if: '$CI_COMMIT_BRANCH == "rawhide"'
+      when: on_failure
+    - if: '$CI_COMMIT_BRANCH == "rakuosel"'
+      when: on_failure
+
+trigger-on-base-build-fail:
+  extends: .trigger-on-build-fail
+  needs:
+    - job: build-base
+      artifacts: false
+
+trigger-on-nvidia-build-fail:
+  extends: .trigger-on-build-fail
+  needs:
+    - job: build-nvidia
+      artifacts: false
+
 # ============================================================
 # ISO Build Tests + Immediate Failure Response
 # ============================================================
@@ -242,7 +327,7 @@ test-iso-nvidia:
       just -f rakuos-forge/Justfile build "${IMAGE_REF}" 1 none squashfs NONE "${IMAGE_REF}" 1
       echo "ISO build succeeded."
 
-.trigger-on-fail:
+.trigger-on-iso-fail:
   stage: test-iso
   image: quay.io/fedora/fedora:latest
   tags:
@@ -252,43 +337,23 @@ test-iso-nvidia:
     - |
       set -euo pipefail
       dnf install -y curl jq
-      cancel_sibling() {
-        local proj_id="$1"
-        local proj_name="$2"
-        if [ "${proj_id}" = "${CI_PROJECT_ID}" ]; then
-          return 0
-        fi
-        for STATUS in running pending; do
-          PIDS=$(curl -sf \
-            --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
-            "https://gitlab.com/api/v4/projects/${proj_id}/pipelines?ref=${CI_COMMIT_BRANCH}&status=${STATUS}&per_page=5" \
-            | grep -o '"id":[0-9]*' | grep -o '[0-9]*' || true)
-          for PID in ${PIDS}; do
-            echo "Cancelling ${proj_name} pipeline ${PID} (${STATUS}) on ${CI_COMMIT_BRANCH}..."
-            curl -sf -X POST \
-              --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
-              "https://gitlab.com/api/v4/projects/${proj_id}/pipelines/${PID}/cancel" || true
-          done
-        done
-      }
-      cancel_sibling "${GNOME_PROJECT_ID}"  "rakuos-gnome"
-      cancel_sibling "${KDE_PROJECT_ID}"    "rakuos-kde"
-      cancel_sibling "${COSMIC_PROJECT_ID}" "rakuos-cosmic"
-      CUTOFF="$(date -u -d '20 minutes ago' +%Y-%m-%dT%H:%M:%SZ)"
-      RECENT=$(curl -sf \
-        --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
-        "https://gitlab.com/api/v4/projects/${BASE_PROJECT_ID}/pipelines?ref=${CI_COMMIT_BRANCH}&updated_after=${CUTOFF}&per_page=5" \
-        | jq 'length')
-      if [ "${RECENT}" -gt 0 ]; then
-        echo "Base rebuild already triggered recently (${RECENT} pipeline(s)). Skipping."
-        exit 0
-      fi
-      echo "Triggering base rebuild on rakuos-base/${CI_COMMIT_BRANCH}..."
+      echo "Cleaning up temp tags for pipeline ${CI_PIPELINE_ID}..."
+      TEMP_TAG_NAME="ci-temp-${CI_PIPELINE_ID}"
+      REPOS=$(curl -sf --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+        "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/registry/repositories?per_page=20")
+      for REPO_ID in $(echo "${REPOS}" | grep -o '"id":[0-9]*' | grep -o '[0-9]*'); do
+        curl -sf -X DELETE \
+          --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+          "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/registry/repositories/${REPO_ID}/tags/${TEMP_TAG_NAME}" || true
+      done
+      echo "Temp tag cleanup complete."
+      echo "Re-triggering ${CI_PROJECT_NAME} pipeline on ${CI_COMMIT_BRANCH}..."
       curl -sf -X POST \
-        --form "token=${TRIGGER_TOKEN_BASE}" \
-        --form "ref=${CI_COMMIT_BRANCH}" \
-        "https://gitlab.com/api/v4/projects/${BASE_PROJECT_ID}/trigger/pipeline"
-      echo "Base rebuild triggered."
+        --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+        --header "Content-Type: application/json" \
+        --data "{\"ref\": \"${CI_COMMIT_BRANCH}\"}" \
+        "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipeline"
+      echo "Pipeline re-triggered."
       echo "Cancelling own pipeline ${CI_PIPELINE_ID}..."
       curl -sf -X POST \
         --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
@@ -306,13 +371,13 @@ test-iso-nvidia:
       when: on_failure
 
 trigger-on-iso-standard-fail:
-  extends: .trigger-on-fail
+  extends: .trigger-on-iso-fail
   needs:
     - job: test-iso-standard
       artifacts: false
 
 trigger-on-iso-nvidia-fail:
-  extends: .trigger-on-fail
+  extends: .trigger-on-iso-fail
   needs:
     - job: test-iso-nvidia
       artifacts: false
