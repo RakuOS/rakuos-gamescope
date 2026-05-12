@@ -349,10 +349,9 @@ test-iso-nvidia:
       echo "Temp tag cleanup complete."
       echo "Re-triggering ${CI_PROJECT_NAME} pipeline on ${CI_COMMIT_BRANCH}..."
       curl -sf -X POST \
-        --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
-        --header "Content-Type: application/json" \
-        --data "{\"ref\": \"${CI_COMMIT_BRANCH}\"}" \
-        "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipeline"
+        --form "token=${TRIGGER_TOKEN_SELF}" \
+        --form "ref=${CI_COMMIT_BRANCH}" \
+        "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/trigger/pipeline"
       echo "Pipeline re-triggered."
       echo "Cancelling own pipeline ${CI_PIPELINE_ID}..."
       curl -sf -X POST \
