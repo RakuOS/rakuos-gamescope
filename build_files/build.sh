@@ -25,6 +25,7 @@ dnf5.real -y install @fonts @hardware-support \
   kde-gtk-config \
   kcm_systemd \
   kwalletmanager5 \
+  plasma-foreground-booster-dmemcg \
   rakuos-welcome-qt \
   rakuos-software-qt
 
@@ -42,9 +43,10 @@ rm -rf /usr/share/plasma/look-and-feel/org.fedoraproject.fedoralight.desktop
 
 ## Remove Fedora Wallpapers
 rm /usr/share/wallpapers/Fedora
-rm -rf /usr/share/wallpapers/F43
+rm -rf /usr/share/wallpapers/F44
 
 #KDE customizations
+rm /usr/share/applications/org.kde.foreground-booster.desktop
 sed -i '$r /usr/share/plasma/shells/org.kde.plasma.desktop/contents/updates/rakuos-pins.js' /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js
 
 ## Enable Services
