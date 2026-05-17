@@ -33,7 +33,7 @@ stages:
 .buildah-job:
   image: quay.io/buildah/stable:latest
   tags:
-    - saas-linux-medium-amd64
+    - saas-linux-2xlarge-amd64
   before_script:
     - |
       case "${CI_COMMIT_BRANCH}" in
@@ -155,7 +155,7 @@ build-nvidia:
   stage: build
   image: quay.io/fedora/fedora:latest
   tags:
-    - saas-linux-small-amd64
+    - saas-linux-2xlarge-amd64
   allow_failure: true
   script:
     - |
@@ -331,7 +331,7 @@ test-iso-nvidia:
   stage: test-iso
   image: quay.io/fedora/fedora:latest
   tags:
-    - saas-linux-small-amd64
+    - saas-linux-2xlarge-amd64
   allow_failure: true
   script:
     - |
@@ -385,7 +385,7 @@ push-tags-base:
   stage: push
   image: quay.io/buildah/stable:latest
   tags:
-    - saas-linux-small-amd64
+    - saas-linux-2xlarge-amd64
   needs:
     - job: test-iso-standard
       artifacts: false
@@ -427,7 +427,7 @@ push-tags-nvidia:
   stage: push
   image: quay.io/buildah/stable:latest
   tags:
-    - saas-linux-small-amd64
+    - saas-linux-2xlarge-amd64
   needs:
     - job: test-iso-standard
       artifacts: false
@@ -469,7 +469,7 @@ cleanup-temp-tags:
   stage: cleanup
   image: quay.io/buildah/stable:latest
   tags:
-    - saas-linux-small-amd64
+    - saas-linux-2xlarge-amd64
   when: always
   script:
     - |
