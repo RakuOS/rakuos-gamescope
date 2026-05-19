@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="150" height="30" viewBox="0 0 150 30" xmlns="http://www.w3.org/2000/svg">
+  <!-- active -->
+  <g id="active-center" transform="translate(0,0)">
+    <rect x="11" y="8"  width="9" height="9" rx="1" fill="none"    stroke="#262A31" stroke-width="1.5"/>
+    <rect x="8"  y="11" width="9" height="9" rx="1" fill="#ECEFF4" stroke="#262A31" stroke-width="1.5"/>
+  </g>
+  <!-- hover -->
+  <g id="hover-center" transform="translate(30,0)">
+    <rect x="3" y="3" width="24" height="24" rx="4" fill="#5E81AC" fill-opacity="0.3"/>
+    <rect x="11" y="8"  width="9" height="9" rx="1" fill="none"    stroke="#262A31" stroke-width="1.5"/>
+    <rect x="8"  y="11" width="9" height="9" rx="1" fill="#C8D0DC" stroke="#262A31" stroke-width="1.5"/>
+  </g>
+  <!-- pressed -->
+  <g id="pressed-center" transform="translate(60,0)">
+    <rect x="3" y="3" width="24" height="24" rx="4" fill="#5E81AC" fill-opacity="0.5"/>
+    <rect x="11" y="8"  width="9" height="9" rx="1" fill="none"    stroke="#262A31" stroke-width="1.5"/>
+    <rect x="8"  y="11" width="9" height="9" rx="1" fill="#B8C0CC" stroke="#262A31" stroke-width="1.5"/>
+  </g>
+  <!-- inactive -->
+  <g id="inactive-center" transform="translate(90,0)">
+    <rect x="11" y="8"  width="9" height="9" rx="1" fill="none"    stroke="#6C7080" stroke-width="1.5"/>
+    <rect x="8"  y="11" width="9" height="9" rx="1" fill="#DFE1E4" stroke="#6C7080" stroke-width="1.5"/>
+  </g>
+  <!-- deactivated -->
+  <g id="deactivated-center" transform="translate(120,0)">
+    <rect x="11" y="8"  width="9" height="9" rx="1" fill="none"    stroke="#A8ACBA" stroke-width="1.5"/>
+    <rect x="8"  y="11" width="9" height="9" rx="1" fill="#DFE1E4" stroke="#A8ACBA" stroke-width="1.5"/>
+  </g>
+</svg>
