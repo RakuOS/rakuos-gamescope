@@ -4,6 +4,9 @@ EngineType=aurorae
 [General]
 ActiveTextColor=215,218,223
 InactiveTextColor=107,112,122
+LeftButtons=
+RightButtons=IAX
+TitleAlignment=Center
 
 [Layout]
 BorderBottom=0

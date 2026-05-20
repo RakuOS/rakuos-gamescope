@@ -22,7 +22,7 @@ GrayEffect=2
 
 [Colors:Button]
 BackgroundAlternate=210,214,220
-BackgroundNormal=210,214,220
+BackgroundNormal=223,225,228
 DecorationFocus=94,129,172
 DecorationHover=223,225,228
 ForegroundActive=94,129,172
@@ -36,7 +36,7 @@ ForegroundVisited=143,113,139
 
 [Colors:Header]
 BackgroundAlternate=223,225,228
-BackgroundNormal=236,239,244
+BackgroundNormal=223,225,228
 DecorationFocus=94,129,172
 DecorationHover=223,225,228
 ForegroundActive=94,129,172
@@ -105,7 +105,7 @@ ForegroundVisited=143,113,139
 
 [Colors:Window]
 BackgroundAlternate=223,225,228
-BackgroundNormal=236,239,244
+BackgroundNormal=223,225,228
 DecorationFocus=94,129,172
 DecorationHover=223,225,228
 ForegroundActive=94,129,172

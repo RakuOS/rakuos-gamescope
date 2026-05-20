@@ -35,7 +35,7 @@ reduce_window_opacity=0
 reduce_menu_opacity=0
 
 [GeneralColors]
-window.color=26,29,36
+window.color=16,18,22
 base.color=34,37,41
 alt.base.color=39,42,46
 button.color=51,62,79
