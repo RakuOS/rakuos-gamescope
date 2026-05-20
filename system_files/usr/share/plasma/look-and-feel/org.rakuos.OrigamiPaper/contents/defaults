@@ -14,5 +14,8 @@ name=OrigamiPaper
 library=org.kde.kwin.aurorae
 theme=__aurorae__svg__OrigamiPaperDark
 
+[kcminputrc][Mouse]
+cursorTheme=Bibata-Original-Classic
+
 [Wallpaper]
 Image=RakuOS

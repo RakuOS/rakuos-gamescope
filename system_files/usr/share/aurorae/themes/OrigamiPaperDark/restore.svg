@@ -2,6 +2,7 @@
 <svg width="150" height="30" viewBox="0 0 150 30" xmlns="http://www.w3.org/2000/svg">
   <!-- active -->
   <g id="active-center" transform="translate(0,0)">
+    <rect x="0" y="0" width="30" height="30" fill="#1A1D24" fill-opacity="0.01"/>
     <rect x="11" y="8"  width="9" height="9" rx="1" fill="none" stroke="#D7DADF" stroke-width="1.5"/>
     <rect x="8"  y="11" width="9" height="9" rx="1" fill="#1A1D24" stroke="#D7DADF" stroke-width="1.5"/>
   </g>
@@ -19,11 +20,13 @@
   </g>
   <!-- inactive -->
   <g id="inactive-center" transform="translate(90,0)">
+    <rect x="0" y="0" width="30" height="30" fill="#1A1D24" fill-opacity="0.01"/>
     <rect x="11" y="8"  width="9" height="9" rx="1" fill="none"    stroke="#6B707A" stroke-width="1.5"/>
     <rect x="8"  y="11" width="9" height="9" rx="1" fill="#272A2E" stroke="#6B707A" stroke-width="1.5"/>
   </g>
   <!-- deactivated -->
   <g id="deactivated-center" transform="translate(120,0)">
+    <rect x="0" y="0" width="30" height="30" fill="#1A1D24" fill-opacity="0.01"/>
     <rect x="11" y="8"  width="9" height="9" rx="1" fill="none"    stroke="#4B4E57" stroke-width="1.5"/>
     <rect x="8"  y="11" width="9" height="9" rx="1" fill="#272A2E" stroke="#4B4E57" stroke-width="1.5"/>
   </g>
