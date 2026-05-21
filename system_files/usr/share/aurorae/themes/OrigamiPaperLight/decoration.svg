@@ -4,14 +4,14 @@
     <rect id="decoration-center" x="0" y="0" width="84" height="32" fill="#DFE1E4"/>
 
     <!-- Border strips -->
-    <rect id="decoration-top"    x="0"  y="0"  width="84" height="1"  fill="#DFE1E4"/>
-    <rect id="decoration-left"   x="0"  y="0"  width="1"  height="84" fill="#DFE1E4"/>
-    <rect id="decoration-right"  x="83" y="0"  width="1"  height="84" fill="#DFE1E4"/>
-    <rect id="decoration-bottom" x="0"  y="83" width="84" height="1"  fill="#DFE1E4"/>
+    <rect id="decoration-top"    x="0"  y="0"  width="84" height="1"  fill="#C4C7CD"/>
+    <rect id="decoration-left"   x="0"  y="0"  width="1"  height="84" fill="#C4C7CD"/>
+    <rect id="decoration-right"  x="83" y="0"  width="1"  height="84" fill="#C4C7CD"/>
+    <rect id="decoration-bottom" x="0"  y="83" width="84" height="1"  fill="#C4C7CD"/>
 
     <!-- Corners -->
-    <rect id="decoration-topleft"     x="0"  y="0"  width="1" height="32" fill="#DFE1E4"/>
-    <rect id="decoration-topright"    x="83" y="0"  width="1" height="32" fill="#DFE1E4"/>
-    <rect id="decoration-bottomleft"  x="0"  y="83" width="1" height="1"  fill="#DFE1E4"/>
-    <rect id="decoration-bottomright" x="83" y="83" width="1" height="1"  fill="#DFE1E4"/>
+    <rect id="decoration-topleft"     x="0"  y="0"  width="1" height="32" fill="#C4C7CD"/>
+    <rect id="decoration-topright"    x="83" y="0"  width="1" height="32" fill="#C4C7CD"/>
+    <rect id="decoration-bottomleft"  x="0"  y="83" width="1" height="1"  fill="#C4C7CD"/>
+    <rect id="decoration-bottomright" x="83" y="83" width="1" height="1"  fill="#C4C7CD"/>
 </svg>

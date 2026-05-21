@@ -9,9 +9,9 @@ RightButtons=IAX
 TitleAlignment=Center
 
 [Layout]
-BorderBottom=0
-BorderLeft=0
-BorderRight=0
+BorderBottom=1
+BorderLeft=1
+BorderRight=1
 BorderTop=0
 ButtonHeight=20
 ButtonMarginTop=0
