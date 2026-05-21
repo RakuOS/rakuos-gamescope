@@ -17,6 +17,6 @@ taskbarFont=Inter,11,-1,5,50,0,0,0,0,0
 toolBarFont=Inter,10,-1,5,50,0,0,0,0,0
 
 [GTK]
-GTK2Theme=Breeze-Dark
-GTK3Theme=Breeze-Dark
-GTK4Theme=Breeze-Dark
+GTK2Theme=OrigamiPaper
+GTK3Theme=OrigamiPaper
+GTK4Theme=OrigamiPaper
