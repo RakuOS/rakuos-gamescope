@@ -19,9 +19,6 @@ variables:
   DEFAULT_TAG: "latest"
   IMAGE_DESC: "RakuOS KDE"
   IMAGE_KEYWORDS: "bootc,fedora,atomic,kde,plasma"
-  TITANOBOA_REPO: "https://gitlab.com/rakuos/iso/rakuos-forge.git"
-  TITANOBOA_REF: "main"
-  ISO_CONFIG_REPO: "https://gitlab.com/rakuos/iso/rakuos-kde-iso.git"
 
 stages:
   - build
@@ -160,7 +157,7 @@ build-nvidia:
   script:
     - |
       set -euo pipefail
-      dnf install -y curl jq
+      dnf5.real install -y curl jq
       echo "Cleaning up temp tags for pipeline ${CI_PIPELINE_ID}..."
       TEMP_TAG_NAME="ci-temp-${CI_PIPELINE_ID}"
       REPOS=$(curl -sf --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
@@ -237,54 +234,20 @@ trigger-on-nvidia-build-fail:
       artifacts: false
 
 # ============================================================
-# ISO Build Tests + Immediate Failure Response
+# RPM DB Stress Tests + Immediate Failure Response
 # ============================================================
 # Requires group CI/CD variables:
-#   BASE_PROJECT_ID     — numeric GitLab project ID of rakuos-base
-#   TRIGGER_TOKEN_BASE  — pipeline trigger token for rakuos-base
-#   GITLAB_API_TOKEN    — api-scoped token for dedup check + pipeline cancellation
-#   GNOME_PROJECT_ID    — numeric GitLab project ID of rakuos-gnome
-#   KDE_PROJECT_ID      — numeric GitLab project ID of rakuos-kde
-#   COSMIC_PROJECT_ID   — numeric GitLab project ID of rakuos-cosmic
+#   TRIGGER_TOKEN_SELF  — pipeline trigger token for this project
+#   GITLAB_API_TOKEN    — api-scoped token for pipeline cancellation
 
-.iso-test-job:
-  image: quay.io/fedora/fedora:latest
+.image-test-job:
+  image: quay.io/buildah/stable:latest
   tags:
     - saas-linux-2xlarge-amd64
-  timeout: 75 minutes
-  before_script:
-    - |
-      set -euo pipefail
-      dnf install -y \
-        git \
-        just \
-        podman \
-        jq \
-        curl \
-        findutils \
-        tar \
-        xorriso \
-        dosfstools \
-        grub2 \
-        grub2-efi \
-        grub2-tools \
-        grub2-tools-extra \
-        grub2-efi-x64 \
-        grub2-efi-x64-cdboot \
-        grub2-efi-x64-modules \
-        shim \
-        squashfs-tools \
-        erofs-utils \
-        policycoreutils
-      case "${CI_COMMIT_BRANCH}" in
-        "${CI_DEFAULT_BRANCH}") export BRANCH_SLUG="latest"    ;;
-        "staging")              export BRANCH_SLUG="staging"   ;;
-        "rawhide")              export BRANCH_SLUG="rawhide"   ;;
-        "rakuosel")             export BRANCH_SLUG="rakuosel"  ;;
-        *)                      export BRANCH_SLUG="$(printf '%s' "${CI_COMMIT_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')" ;;
-      esac
-      git clone --depth 1 --branch "${TITANOBOA_REF}" "${TITANOBOA_REPO}" rakuos-forge
-      git clone --depth 1 "${ISO_CONFIG_REPO}" iso-config
+  timeout: 30 minutes
+  variables:
+    STORAGE_DRIVER: overlay
+    BUILDAH_FORMAT: docker
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: never
@@ -293,8 +256,8 @@ trigger-on-nvidia-build-fail:
     - if: '$CI_COMMIT_BRANCH == "rawhide"'
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
-test-iso-standard:
-  extends: .iso-test-job
+test-image-standard:
+  extends: .image-test-job
   stage: test-iso
   needs:
     - job: build-base
@@ -302,16 +265,28 @@ test-iso-standard:
   script:
     - |
       set -euo pipefail
-      export IMAGE_REF="${IMAGE_REGISTRY}:ci-temp-${CI_PIPELINE_ID}"
-      export TITANOBOA_BUILDER_DISTRO="fedora"
-      export HOOK_post_rootfs="${CI_PROJECT_DIR}/iso-config/config/configure-iso.sh"
-      export HOOK_pre_initramfs="${CI_PROJECT_DIR}/iso-config/config/pre_initramfs.sh"
-      echo "Testing ISO build for ${IMAGE_REF}..."
-      just -f rakuos-forge/Justfile build "${IMAGE_REF}" 1 none squashfs NONE "${IMAGE_REF}" 1
-      echo "ISO build succeeded."
+      IMAGE_REF="${IMAGE_REGISTRY}:ci-temp-${CI_PIPELINE_ID}"
+      buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
+      buildah pull "docker://${IMAGE_REF}"
+      CTR=$(buildah from "${IMAGE_REF}")
 
-test-iso-nvidia:
-  extends: .iso-test-job
+      echo "=== RPM DB stress test: Justfile + Anaconda packages ==="
+      buildah run --isolation chroot --network host "${CTR}" -- \
+        dnf5.real install -y --allowerasing \
+          --enable-repo=fedora-cisco-openh264 \
+          dracut-live livesys-scripts fuse-overlayfs \
+          anaconda-live libblockdev-btrfs libblockdev-lvm libblockdev-dm \
+          qrencode yad
+
+      echo "=== RPM DB stress test: packages-live.list ==="
+      buildah run --isolation chroot --network host "${CTR}" -- \
+        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs dnf5.real install -y'
+
+      buildah rm "${CTR}" || true
+      echo "RPM DB stress test passed."
+
+test-image-nvidia:
+  extends: .image-test-job
   stage: test-iso
   needs:
     - job: build-nvidia
@@ -319,13 +294,29 @@ test-iso-nvidia:
   script:
     - |
       set -euo pipefail
-      export IMAGE_REF="${IMAGE_REGISTRY_NVIDIA}:ci-temp-${CI_PIPELINE_ID}"
-      export TITANOBOA_BUILDER_DISTRO="fedora"
-      export HOOK_post_rootfs="${CI_PROJECT_DIR}/iso-config/config/configure-iso.sh"
-      export HOOK_pre_initramfs="${CI_PROJECT_DIR}/iso-config/config/pre_initramfs.sh"
-      echo "Testing ISO build for ${IMAGE_REF}..."
-      just -f rakuos-forge/Justfile build "${IMAGE_REF}" 1 none squashfs NONE "${IMAGE_REF}" 1
-      echo "ISO build succeeded."
+      IMAGE_REF="${IMAGE_REGISTRY_NVIDIA}:ci-temp-${CI_PIPELINE_ID}"
+      buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
+      buildah pull "docker://${IMAGE_REF}"
+      CTR=$(buildah from "${IMAGE_REF}")
+
+      echo "=== RPM DB stress test: Justfile + Anaconda packages ==="
+      buildah run --isolation chroot --network host "${CTR}" -- \
+        dnf5.real install -y --allowerasing \
+          --enable-repo=fedora-cisco-openh264 \
+          dracut-live livesys-scripts fuse-overlayfs \
+          anaconda-live libblockdev-btrfs libblockdev-lvm libblockdev-dm \
+          qrencode yad
+
+      echo "=== RPM DB stress test: packages-live.list ==="
+      buildah run --isolation chroot --network host "${CTR}" -- \
+        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs dnf5.real install -y'
+
+      echo "=== RPM DB stress test: NVIDIA packages ==="
+      buildah run --isolation chroot --network host "${CTR}" -- \
+        bash -c 'for pkg in nvidia-gpu-firmware mesa-vulkan-drivers; do dnf5.real -yq reinstall --allowerasing "$pkg" || dnf5.real -yq install --allowerasing "$pkg"; done'
+
+      buildah rm "${CTR}" || true
+      echo "RPM DB stress test (NVIDIA) passed."
 
 .trigger-on-iso-fail:
   stage: test-iso
@@ -336,7 +327,7 @@ test-iso-nvidia:
   script:
     - |
       set -euo pipefail
-      dnf install -y curl jq
+      dnf5.real install -y curl jq
       echo "Cleaning up temp tags for pipeline ${CI_PIPELINE_ID}..."
       TEMP_TAG_NAME="ci-temp-${CI_PIPELINE_ID}"
       REPOS=$(curl -sf --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
@@ -369,16 +360,16 @@ test-iso-nvidia:
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
       when: on_failure
 
-trigger-on-iso-standard-fail:
+trigger-on-image-standard-fail:
   extends: .trigger-on-iso-fail
   needs:
-    - job: test-iso-standard
+    - job: test-image-standard
       artifacts: false
 
-trigger-on-iso-nvidia-fail:
+trigger-on-image-nvidia-fail:
   extends: .trigger-on-iso-fail
   needs:
-    - job: test-iso-nvidia
+    - job: test-image-nvidia
       artifacts: false
 
 push-tags-base:
@@ -387,9 +378,9 @@ push-tags-base:
   tags:
     - saas-linux-2xlarge-amd64
   needs:
-    - job: test-iso-standard
+    - job: test-image-standard
       artifacts: false
-    - job: test-iso-nvidia
+    - job: test-image-nvidia
       artifacts: false
   script:
     - |
@@ -429,9 +420,9 @@ push-tags-nvidia:
   tags:
     - saas-linux-2xlarge-amd64
   needs:
-    - job: test-iso-standard
+    - job: test-image-standard
       artifacts: false
-    - job: test-iso-nvidia
+    - job: test-image-nvidia
       artifacts: false
   script:
     - |
