@@ -7,6 +7,14 @@ ColorScheme=OrigamiPaperLight
 [kdeglobals][Icons]
 Theme=WhiteSur-dark
 
+[kdeglobals][Fonts]
+fixed=Maple Mono NF,11,-1,5,50,0,0,0,0,0
+general=Inter,11,-1,5,50,0,0,0,0,0
+menuFont=Inter,11,-1,5,50,0,0,0,0,0
+smallestReadableFont=Inter,9,-1,5,50,0,0,0,0,0
+taskbarFont=Inter,11,-1,5,50,0,0,0,0,0
+toolBarFont=Inter,10,-1,5,50,0,0,0,0,0
+
 [plasmarc][Theme]
 name=OrigamiPaperLight
 
