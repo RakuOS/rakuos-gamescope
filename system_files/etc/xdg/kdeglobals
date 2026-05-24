@@ -1,6 +1,6 @@
 [KDE]
 LookAndFeelPackage=org.rakuos.OrigamiPaper
-widgetStyle=kvantum
+widgetStyle=breeze
 
 [General]
 ColorScheme=OrigamiPaperDark
