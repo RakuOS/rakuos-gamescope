@@ -9,8 +9,16 @@ dnf5.real -y install @fonts @hardware-support \
   plasma-workspace \
   plasma-workspace-wayland \
   plasma-browser-integration \
+  akonadi-server \
+  akonadi-server-mysql \
   kscreen \
   plasma-login-manager \
+  kio-admin \
+  fprintd-pam \
+  flatpak-kcm \
+  kio-gdrive \
+  kaccounts-integration-qt6 \
+  kaccounts-providers \
   kwin \
   kmenuedit \
   kinfocenter \
@@ -25,6 +33,11 @@ dnf5.real -y install @fonts @hardware-support \
   kde-gtk-config \
   kcm_systemd \
   kwalletmanager5 \
+  pam-kwallet \
+  signon-kwallet-extension \
+  systemd-oomd-defaults \
+  samba-usershares \
+  libappindicator-gtk3 \
   plasma-foreground-booster-dmemcg \
   rakuos-welcome-qt \
   rakuos-software-qt
