@@ -40,6 +40,16 @@ dnf5.real -y install @fonts @hardware-support \
   libappindicator-gtk3 \
   plasma-foreground-booster-dmemcg \
   rakuos-welcome-qt \
+  ark \
+  dolphin \
+  gwenview \
+  okular \
+  kate \
+  kde-partitionmanager \
+  plasma-systemmonitor \
+  konsole \
+  kcalc \
+  spectacle \
   rakuos-software-qt
 
 ## Remove packages
