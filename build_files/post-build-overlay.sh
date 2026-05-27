@@ -57,11 +57,11 @@ prebake_overlay_from_installroot() {
     fi
 
     mapfile -t prebake_packages < <(
-        grep -v '^\s*#' "$PACKAGES_LIST"
-        | grep -v '^\s*$'
-        | sed 's/\s*#.*//'
-        | tr -s 't' '\n'
-        | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+        grep -v '^\s*#' "$PACKAGES_LIST" \
+        | grep -v '^\s*$' \
+        | sed 's/\s*#.*//' \
+        | tr -s ' \t' '\n' \
+        | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' \
         | grep -v '^$'
     )
 
@@ -83,13 +83,13 @@ prebake_overlay_from_installroot() {
         cp -a "$IMAGE_PACKAGES_TOML" "$installroot/usr/lib/sysimage/libdnf5/packages.toml"
     fi
 
-    dnf5.real --config="$dnf_conf"
-        --use-host-config
-        --installroot="$installroot"
-        --releasever="$releasever"
-        --setopt=keepcache=1
-        --setopt=cachedir="$installroot/var/cache/libdnf5"
-        --setopt=tsflags=noscripts
+    dnf5.real --config="$dnf_conf" \
+        --use-host-config \
+        --installroot="$installroot" \
+        --releasever="$releasever" \
+        --setopt=keepcache=1 \
+        --setopt=cachedir="$installroot/var/cache/libdnf5" \
+        --setopt=tsflags=noscripts \
         install -y --refresh "${prebake_packages[@]}"
 
     echo "[rakuos] Copying prebaked /usr payload into overlay upper..."
