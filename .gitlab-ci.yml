@@ -157,7 +157,7 @@ build-nvidia:
   script:
     - |
       set -euo pipefail
-      dnf5.real install -y curl jq
+      dnf5 install -y curl jq
       echo "Cleaning up temp tags for pipeline ${CI_PIPELINE_ID}..."
       TEMP_TAG_NAME="ci-temp-${CI_PIPELINE_ID}"
       REPOS=$(curl -sf --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
