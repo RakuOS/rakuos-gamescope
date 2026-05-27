@@ -57,11 +57,11 @@ prebake_overlay_from_installroot() {
     fi
 
     mapfile -t prebake_packages < <(
-        grep -v '^\s*#' "$PACKAGES_LIST" \
-        | grep -v '^\s*$' \
-        | sed 's/\s*#.*//' \
-        | tr -s ' \t' '\n' \
-        | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' \
+        grep -v '^\s*#' "$PACKAGES_LIST"
+        | grep -v '^\s*$'
+        | sed 's/\s*#.*//'
+        | tr -s 't' '\n'
+        | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
         | grep -v '^$'
     )
 
@@ -83,13 +83,13 @@ prebake_overlay_from_installroot() {
         cp -a "$IMAGE_PACKAGES_TOML" "$installroot/usr/lib/sysimage/libdnf5/packages.toml"
     fi
 
-    dnf5.real --config="$dnf_conf" \
-        --use-host-config \
-        --installroot="$installroot" \
-        --releasever="$releasever" \
-        --setopt=keepcache=1 \
-        --setopt=cachedir="$installroot/var/cache/libdnf5" \
-        --setopt=tsflags=noscripts \
+    dnf5.real --config="$dnf_conf"
+        --use-host-config
+        --installroot="$installroot"
+        --releasever="$releasever"
+        --setopt=keepcache=1
+        --setopt=cachedir="$installroot/var/cache/libdnf5"
+        --setopt=tsflags=noscripts
         install -y --refresh "${prebake_packages[@]}"
 
     echo "[rakuos] Copying prebaked /usr payload into overlay upper..."
@@ -148,29 +148,52 @@ echo "Appending KDE protected packages to protected-packages.txt..."
 cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
 
 # KDE DE packages (from rakuos-kde/build_files/build.sh)
-plasma-desktop
-plasma-workspace
-plasma-workspace-wayland
-plasma-browser-integration
-kscreen
-plasma-login-manager
-kwin
-kmenuedit
-kinfocenter
-plasma-nm
-plasma-pa
-kdegraphics-thumbnailers
-breeze-icon-theme
-breeze-gtk
-bluedevil
-bluez
-bluez-obexd
-kde-gtk-config
-kcm_systemd
-kwalletmanager5
-plasma-setup
-rakuos-welcome-qt
-rakuos-software-qt
+  plasma-desktop
+  plasma-workspace
+  plasma-workspace-wayland
+  plasma-browser-integration
+  akonadi-server
+  akonadi-server-mysql
+  kscreen
+  plasma-login-manager
+  kio-admin
+  fprintd-pam
+  flatpak-kcm
+  kio-gdrive
+  kaccounts-integration-qt6
+  kaccounts-providers
+  kwin
+  kmenuedit
+  kinfocenter
+  plasma-nm
+  plasma-pa
+  kdegraphics-thumbnailers
+  breeze-icon-theme
+  breeze-gtk
+  bluedevil
+  bluez
+  bluez-obexd
+  kde-gtk-config
+  kcm_systemd
+  kwalletmanager5
+  pam-kwallet
+  signon-kwallet-extension
+  systemd-oomd-defaults
+  samba-usershares
+  libappindicator-gtk3
+  plasma-foreground-booster-dmemcg
+  rakuos-welcome-qt
+  ark
+  dolphin
+  gwenview
+  okular
+  kate
+  kde-partitionmanager
+  plasma-systemmonitor
+  konsole
+  kcalc
+  spectacle
+  rakuos-software-qt
 EOF
 
 echo "Generating base file manifest..."
