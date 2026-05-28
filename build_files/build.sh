@@ -5,52 +5,56 @@ FEDORA_VERSION=$(rpm -E %fedora)
 
 ## Install packages
 dnf5.real -y install @fonts @hardware-support \
-  plasma-desktop \
-  plasma-workspace \
-  plasma-workspace-wayland \
-  plasma-browser-integration \
   akonadi-server \
   akonadi-server-mysql \
-  kscreen \
-  plasma-login-manager \
-  kio-admin \
-  fprintd-pam \
-  flatpak-kcm \
-  kio-gdrive \
-  kaccounts-integration-qt6 \
-  kaccounts-providers \
-  kwin \
-  kmenuedit \
-  kinfocenter \
-  plasma-nm \
-  plasma-pa \
-  kdegraphics-thumbnailers \
-  breeze-icon-theme \
-  breeze-gtk \
+  ark \
   bluedevil \
   bluez \
   bluez-obexd \
-  kde-gtk-config \
-  kcm_systemd \
-  kwalletmanager5 \
-  pam-kwallet \
-  signon-kwallet-extension \
-  systemd-oomd-defaults \
-  samba-usershares \
-  libappindicator-gtk3 \
-  plasma-foreground-booster-dmemcg \
-  rakuos-welcome-qt \
-  ark \
+  breeze-gtk \
+  breeze-icon-theme \
   dolphin \
+  flatpak-kcm \
+  fprintd-pam \
   gwenview \
-  okular \
+  icoutils \
+  kaccounts-integration-qt6 \
+  kaccounts-providers \
   kate \
-  kde-partitionmanager \
-  plasma-systemmonitor \
-  konsole \
   kcalc \
+  kcm_systemd \
+  kde-gtk-config \
+  kde-partitionmanager \
+  kdegraphics-thumbnailers \
+  kf6-kimageformats \
+  kinfocenter \
+  kio-admin \
+  kio-gdrive \
+  kmenuedit \
+  konsole \
+  kscreen \
+  ksshaskpass \
+  kwalletmanager5 \
+  kwin \
+  libappindicator-gtk3 \
+  okular \
+  pam-kwallet \
+  plasma-browser-integration \
+  plasma-desktop \
+  plasma-foreground-booster-dmemcg \
+  plasma-login-manager \
+  plasma-nm \
+  plasma-pa \
+  plasma-systemmonitor \
+  plasma-workspace \
+  plasma-workspace-wayland \
+  qt6-qtimageformats \
+  rakuos-software-qt \
+  rakuos-welcome-qt \
+  samba-usershares \
+  signon-kwallet-extension \
   spectacle \
-  rakuos-software-qt
+  systemd-oomd-defaults
 
 ## Remove packages
 dnf5.real -y remove plasma-discover \
