@@ -11,6 +11,7 @@ dnf5.real -y install @fonts @hardware-support \
   bluedevil \
   bluez \
   bluez-obexd \
+  bluez-cups \
   breeze-gtk \
   breeze-icon-theme \
   dolphin \

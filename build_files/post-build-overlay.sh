@@ -173,6 +173,7 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   bluedevil
   bluez
   bluez-obexd
+  bluez-cups
   kde-gtk-config
   kcm_systemd
   kwalletmanager5
