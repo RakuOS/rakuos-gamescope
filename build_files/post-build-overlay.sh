@@ -193,6 +193,10 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   konsole
   kcalc
   spectacle
+  icoutils
+  kf6-kimageformats
+  ksshaskpass
+  qt6-qtimageformats
   rakuos-software-qt
 EOF
 
