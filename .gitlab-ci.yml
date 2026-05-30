@@ -77,6 +77,7 @@ build-base:
       buildah build \
         --file Containerfile \
         --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
+        --squash \
         --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         --label "org.opencontainers.image.description=${IMAGE_DESC}" \
         --label "org.opencontainers.image.source=${CI_PROJECT_URL}" \
@@ -91,7 +92,7 @@ build-base:
       if [ "${CI_PIPELINE_SOURCE}" != "merge_request_event" ]; then
         buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
         echo "Pushing temporary image ${TEMP_TAG}..."
-        buildah push "${TEMP_TAG}"
+        buildah push --compression-format zstd:chunked "${TEMP_TAG}"
       fi
   artifacts:
     reports:
@@ -122,6 +123,7 @@ build-nvidia:
       buildah build \
         --file Containerfile.nvidia \
         --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
+        --squash \
         --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         --label "org.opencontainers.image.description=${IMAGE_DESC} (NVIDIA)" \
         --label "org.opencontainers.image.source=${CI_PROJECT_URL}" \
@@ -136,7 +138,7 @@ build-nvidia:
       if [ "${CI_PIPELINE_SOURCE}" != "merge_request_event" ]; then
         buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.com
         echo "Pushing temporary image ${TEMP_TAG}..."
-        buildah push "${TEMP_TAG}"
+        buildah push --compression-format zstd:chunked "${TEMP_TAG}"
       fi
   artifacts:
     reports:
@@ -403,7 +405,7 @@ push-tags-base:
       fi
       for tag in ${FINAL_TAGS}; do
         echo "Pushing ${tag}..."
-        buildah push "${TEMP_TAG}" "docker://${tag}"
+        buildah push --compression-format zstd:chunked "${TEMP_TAG}" "docker://${tag}"
       done
       echo "All final tags pushed."
   rules:
@@ -445,7 +447,7 @@ push-tags-nvidia:
       fi
       for tag in ${FINAL_TAGS}; do
         echo "Pushing ${tag}..."
-        buildah push "${TEMP_TAG}" "docker://${tag}"
+        buildah push --compression-format zstd:chunked "${TEMP_TAG}" "docker://${tag}"
       done
       echo "All final tags pushed."
   rules:
