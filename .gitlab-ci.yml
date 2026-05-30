@@ -56,7 +56,7 @@ stages:
     - export DATE_TAG="$(date -u +%Y%m%d)"
   variables:
     STORAGE_DRIVER: overlay
-    BUILDAH_FORMAT: docker
+    BUILDAH_FORMAT: oci
 
 build-base:
   extends: .buildah-job
@@ -247,7 +247,7 @@ trigger-on-nvidia-build-fail:
   timeout: 30 minutes
   variables:
     STORAGE_DRIVER: overlay
-    BUILDAH_FORMAT: docker
+    BUILDAH_FORMAT: oci
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: never
