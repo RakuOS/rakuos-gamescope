@@ -169,10 +169,10 @@ build-nvidia:
       echo "Cleaning up Quay temp tags for pipeline ${CI_PIPELINE_ID}..."
       TEMP_TAG_NAME="ci-temp-${CI_PIPELINE_ID}"
       curl -sf -X DELETE \
-        -H "Authorization: Bearer ${QUAY_TOKEN}" \
+        -H "Authorization: Bearer ${QUAY_API_TOKEN}" \
         "https://quay.io/api/v1/repository/${IMAGE_REGISTRY_QUAY#quay.io/}/tag/${TEMP_TAG_NAME}" || true
       curl -sf -X DELETE \
-        -H "Authorization: Bearer ${QUAY_TOKEN}" \
+        -H "Authorization: Bearer ${QUAY_API_TOKEN}" \
         "https://quay.io/api/v1/repository/${IMAGE_REGISTRY_QUAY_NVIDIA#quay.io/}/tag/${TEMP_TAG_NAME}" || true
       echo "Temp tag cleanup complete."
       cancel_sibling() {
@@ -338,10 +338,10 @@ test-image-nvidia:
       echo "Cleaning up Quay temp tags for pipeline ${CI_PIPELINE_ID}..."
       TEMP_TAG_NAME="ci-temp-${CI_PIPELINE_ID}"
       curl -sf -X DELETE \
-        -H "Authorization: Bearer ${QUAY_TOKEN}" \
+        -H "Authorization: Bearer ${QUAY_API_TOKEN}" \
         "https://quay.io/api/v1/repository/${IMAGE_REGISTRY_QUAY#quay.io/}/tag/${TEMP_TAG_NAME}" || true
       curl -sf -X DELETE \
-        -H "Authorization: Bearer ${QUAY_TOKEN}" \
+        -H "Authorization: Bearer ${QUAY_API_TOKEN}" \
         "https://quay.io/api/v1/repository/${IMAGE_REGISTRY_QUAY_NVIDIA#quay.io/}/tag/${TEMP_TAG_NAME}" || true
       echo "Temp tag cleanup complete."
       echo "Re-triggering ${CI_PROJECT_NAME} pipeline on ${CI_COMMIT_BRANCH}..."
@@ -474,10 +474,10 @@ cleanup-temp-tags:
       echo "Deleting Quay temp tags for pipeline ${CI_PIPELINE_ID}..."
       TEMP_TAG_NAME="ci-temp-${CI_PIPELINE_ID}"
       curl -sf -X DELETE \
-        -H "Authorization: Bearer ${QUAY_TOKEN}" \
+        -H "Authorization: Bearer ${QUAY_API_TOKEN}" \
         "https://quay.io/api/v1/repository/${IMAGE_REGISTRY_QUAY#quay.io/}/tag/${TEMP_TAG_NAME}" || true
       curl -sf -X DELETE \
-        -H "Authorization: Bearer ${QUAY_TOKEN}" \
+        -H "Authorization: Bearer ${QUAY_API_TOKEN}" \
         "https://quay.io/api/v1/repository/${IMAGE_REGISTRY_QUAY_NVIDIA#quay.io/}/tag/${TEMP_TAG_NAME}" || true
       echo "Temp tag cleanup complete."
   rules:
