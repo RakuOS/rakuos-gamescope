@@ -96,7 +96,7 @@ build-base:
       if [ "${CI_PIPELINE_SOURCE}" != "merge_request_event" ]; then
         buildah login -u "${QUAY_USER}" -p "${QUAY_TOKEN}" quay.io
         echo "Pushing temporary image ${TEMP_TAG}..."
-        buildah push --compression-format zstd:chunked "docker://${TEMP_TAG}"
+        buildah push --compression-format zstd:chunked "${TEMP_TAG}" "docker://${TEMP_TAG}"
       fi
   artifacts:
     reports:
@@ -144,7 +144,7 @@ build-nvidia:
       if [ "${CI_PIPELINE_SOURCE}" != "merge_request_event" ]; then
         buildah login -u "${QUAY_USER}" -p "${QUAY_TOKEN}" quay.io
         echo "Pushing temporary image ${TEMP_TAG}..."
-        buildah push --compression-format zstd:chunked "docker://${TEMP_TAG}"
+        buildah push --compression-format zstd:chunked "${TEMP_TAG}" "docker://${TEMP_TAG}"
       fi
   artifacts:
     reports:
