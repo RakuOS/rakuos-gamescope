@@ -469,7 +469,7 @@ sign-image-standard:
   tags:
     - saas-linux-2xlarge-amd64
   needs:
-    - job: push-tags-standard
+    - job: push-tags-base
       artifacts: false
   script:
     - |
