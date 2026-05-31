@@ -9,7 +9,7 @@ COPY build_files /
 # Pull the RakuOS base image from the GitLab Container Registry.
 # BASE_IMAGE_TAG is re-declared inside this stage (ARG values defined before
 # the first FROM must be re-declared in each stage that needs them).
-FROM registry.gitlab.com/rakuos/images/rakuos-base:${BASE_IMAGE_TAG}
+FROM quay.io/rakuos/rakuos-base:${BASE_IMAGE_TAG}
 ARG BASE_IMAGE_TAG
 ENV BASE_IMAGE_TAG=${BASE_IMAGE_TAG}
 
