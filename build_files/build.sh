@@ -53,6 +53,7 @@ dnf5.real -y install @fonts @hardware-support \
   rakuos-software-qt \
   rakuos-welcome-qt \
   samba-usershares \
+  scx-manager \
   signon-kwallet-extension \
   spectacle \
   systemd-oomd-defaults
