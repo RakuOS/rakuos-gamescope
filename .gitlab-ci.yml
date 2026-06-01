@@ -392,6 +392,7 @@ push-tags-base:
   script:
     - |
       set -euo pipefail
+      dnf install -y --quiet jq
       case "${CI_COMMIT_BRANCH}" in
         "${CI_DEFAULT_BRANCH}") BRANCH_SLUG="${DEFAULT_TAG}" ;;
         "staging")              BRANCH_SLUG="staging"        ;;
@@ -449,6 +450,7 @@ push-tags-nvidia:
   script:
     - |
       set -euo pipefail
+      dnf install -y --quiet jq
       case "${CI_COMMIT_BRANCH}" in
         "${CI_DEFAULT_BRANCH}") BRANCH_SLUG="${DEFAULT_TAG}" ;;
         "staging")              BRANCH_SLUG="staging"        ;;
