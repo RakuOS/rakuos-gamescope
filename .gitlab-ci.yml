@@ -1,5 +1,5 @@
 # ============================================================
-# RakuOS KDE Image — GitLab CI/CD Pipeline
+# RakuOS kde Image — GitLab CI/CD Pipeline
 # ============================================================
 
 workflow:
@@ -195,7 +195,7 @@ build-nvidia:
           done
         done
       }
-      cancel_sibling "${GNOME_PROJECT_ID}"  "rakuos-gnome"
+      cancel_sibling "${kde_PROJECT_ID}"  "rakuos-kde"
       cancel_sibling "${KDE_PROJECT_ID}"    "rakuos-kde"
       cancel_sibling "${COSMIC_PROJECT_ID}" "rakuos-cosmic"
       CUTOFF="$(date -u -d '20 minutes ago' +%Y-%m-%dT%H:%M:%SZ)"
