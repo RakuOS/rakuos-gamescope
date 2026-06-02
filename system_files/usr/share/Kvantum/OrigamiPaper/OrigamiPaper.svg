@@ -1,0 +1,1185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 2400" width="700" height="2400">
+  <!--
+    Origami Paper Kvantum SVG
+    Grid layout: x = state_index * 100 (0=normal, 100=focused, 200=pressed/toggled, 300=disabled)
+    y = element_row * 60
+    Interior: x+2, y+2, 96x56 rx=4
+    Frame: x+1, y+1, 98x58 rx=5 stroke-only
+
+    Colors:
+      BUTTON      = #333E4F
+      BUTTON_HOV  = #3D4A5F
+      BTN_PRESS   = #253040
+      BTN_DIS     = #242830
+      COMPONENT   = #222529
+      SURFACE     = #272A2E
+      WINDOW      = #1A1D24
+      BG_BASE     = #101216
+      ACCENT      = #81A1C1
+      DIVIDER     = #38393E
+      HOVER       = #393B3F
+      DESTRUCTIVE = #BF616A
+      TEXT        = #D7DADF
+      TEXT_DIM    = #6B707A
+      FRAME_NRM   = #4A5B70
+      FRAME_DIS   = #363840
+      INP_DIS_BG  = #1E2125
+      INP_DIS_FR  = #303336
+  -->
+
+  <!-- ============================================================ -->
+  <!-- ROW 0: PanelButtonCommand (y=0) -->
+  <!-- ============================================================ -->
+  <!-- normal (x=0) -->
+  <g id="PanelButtonCommand">
+    <g id="PanelButtonCommand-interior">
+      <rect id="PanelButtonCommand-interior.element" x="2" y="2" width="96" height="56" rx="4" fill="#333E4F"/>
+    </g>
+    <g id="PanelButtonCommand-frame">
+      <rect id="PanelButtonCommand-frame.element" x="1" y="1" width="98" height="58" rx="5" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+  <!-- focused (x=100) -->
+  <g id="PanelButtonCommand-focused">
+    <g id="PanelButtonCommand-focused-interior">
+      <rect id="PanelButtonCommand-focused-interior.element" x="102" y="2" width="96" height="56" rx="4" fill="#3D4A5F"/>
+    </g>
+    <g id="PanelButtonCommand-focused-frame">
+      <rect id="PanelButtonCommand-focused-frame.element" x="101" y="1" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <!-- pressed (x=200) -->
+  <g id="PanelButtonCommand-pressed">
+    <g id="PanelButtonCommand-pressed-interior">
+      <rect id="PanelButtonCommand-pressed-interior.element" x="202" y="2" width="96" height="56" rx="4" fill="#253040"/>
+    </g>
+    <g id="PanelButtonCommand-pressed-frame">
+      <rect id="PanelButtonCommand-pressed-frame.element" x="201" y="1" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <!-- disabled (x=300) -->
+  <g id="PanelButtonCommand-disabled">
+    <g id="PanelButtonCommand-disabled-interior">
+      <rect id="PanelButtonCommand-disabled-interior.element" x="302" y="2" width="96" height="56" rx="4" fill="#242830"/>
+    </g>
+    <g id="PanelButtonCommand-disabled-frame">
+      <rect id="PanelButtonCommand-disabled-frame.element" x="301" y="1" width="98" height="58" rx="5" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 1: PanelButtonTool (y=60) -->
+  <!-- ============================================================ -->
+  <g id="PanelButtonTool">
+    <g id="PanelButtonTool-interior">
+      <rect id="PanelButtonTool-interior.element" x="2" y="62" width="96" height="56" rx="4" fill="#333E4F"/>
+    </g>
+    <g id="PanelButtonTool-frame">
+      <rect id="PanelButtonTool-frame.element" x="1" y="61" width="98" height="58" rx="5" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="PanelButtonTool-focused">
+    <g id="PanelButtonTool-focused-interior">
+      <rect id="PanelButtonTool-focused-interior.element" x="102" y="62" width="96" height="56" rx="4" fill="#3D4A5F"/>
+    </g>
+    <g id="PanelButtonTool-focused-frame">
+      <rect id="PanelButtonTool-focused-frame.element" x="101" y="61" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="PanelButtonTool-pressed">
+    <g id="PanelButtonTool-pressed-interior">
+      <rect id="PanelButtonTool-pressed-interior.element" x="202" y="62" width="96" height="56" rx="4" fill="#253040"/>
+    </g>
+    <g id="PanelButtonTool-pressed-frame">
+      <rect id="PanelButtonTool-pressed-frame.element" x="201" y="61" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="PanelButtonTool-toggled">
+    <g id="PanelButtonTool-toggled-interior">
+      <rect id="PanelButtonTool-toggled-interior.element" x="302" y="62" width="96" height="56" rx="4" fill="#253040"/>
+    </g>
+    <g id="PanelButtonTool-toggled-frame">
+      <rect id="PanelButtonTool-toggled-frame.element" x="301" y="61" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 2: GenericFrame (y=120) -->
+  <!-- ============================================================ -->
+  <g id="GenericFrame">
+    <g id="GenericFrame-interior">
+      <rect id="GenericFrame-interior.element" x="2" y="122" width="96" height="56" rx="4" fill="#1A1D24"/>
+    </g>
+    <g id="GenericFrame-frame">
+      <rect id="GenericFrame-frame.element" x="1" y="121" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="GenericFrame-focused">
+    <g id="GenericFrame-focused-interior">
+      <rect id="GenericFrame-focused-interior.element" x="102" y="122" width="96" height="56" rx="4" fill="#1A1D24"/>
+    </g>
+    <g id="GenericFrame-focused-frame">
+      <rect id="GenericFrame-focused-frame.element" x="101" y="121" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="GenericFrame-flat">
+    <g id="GenericFrame-flat-interior">
+      <rect id="GenericFrame-flat-interior.element" x="202" y="122" width="96" height="56" rx="4" fill="#1A1D24"/>
+    </g>
+    <g id="GenericFrame-flat-frame">
+      <rect id="GenericFrame-flat-frame.element" x="201" y="121" width="98" height="58" rx="5" fill="none" stroke="#272A2E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="GenericFrame-sunken">
+    <g id="GenericFrame-sunken-interior">
+      <rect id="GenericFrame-sunken-interior.element" x="302" y="122" width="96" height="56" rx="4" fill="#101216"/>
+    </g>
+    <g id="GenericFrame-sunken-frame">
+      <rect id="GenericFrame-sunken-frame.element" x="301" y="121" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="GenericFrame-disabled">
+    <g id="GenericFrame-disabled-interior">
+      <rect id="GenericFrame-disabled-interior.element" x="402" y="122" width="96" height="56" rx="4" fill="#1A1D24"/>
+    </g>
+    <g id="GenericFrame-disabled-frame">
+      <rect id="GenericFrame-disabled-frame.element" x="401" y="121" width="98" height="58" rx="5" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 3: ToolbarSeparator / StatusBarSeparator (y=180) -->
+  <!-- ============================================================ -->
+  <g id="ToolbarSeparator">
+    <g id="ToolbarSeparator-interior">
+      <rect id="ToolbarSeparator-interior.element" x="48" y="182" width="4" height="56" rx="2" fill="#38393E"/>
+    </g>
+    <g id="ToolbarSeparator-frame">
+      <rect id="ToolbarSeparator-frame.element" x="1" y="181" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+  <g id="StatusBarSeparator">
+    <g id="StatusBarSeparator-interior">
+      <rect id="StatusBarSeparator-interior.element" x="148" y="182" width="4" height="56" rx="2" fill="#38393E"/>
+    </g>
+    <g id="StatusBarSeparator-frame">
+      <rect id="StatusBarSeparator-frame.element" x="101" y="181" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 4: Tab (y=240) -->
+  <!-- ============================================================ -->
+  <g id="Tab">
+    <g id="Tab-interior">
+      <rect id="Tab-interior.element" x="2" y="242" width="96" height="56" rx="4" fill="#272A2E"/>
+    </g>
+    <g id="Tab-frame">
+      <rect id="Tab-frame.element" x="1" y="241" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Tab-focused">
+    <g id="Tab-focused-interior">
+      <rect id="Tab-focused-interior.element" x="102" y="242" width="96" height="56" rx="4" fill="#272A2E"/>
+    </g>
+    <g id="Tab-focused-frame">
+      <rect id="Tab-focused-frame.element" x="101" y="241" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Tab-toggled">
+    <g id="Tab-toggled-interior">
+      <rect id="Tab-toggled-interior.element" x="202" y="242" width="96" height="56" rx="4" fill="#1A1D24"/>
+    </g>
+    <g id="Tab-toggled-frame">
+      <!-- Active tab bottom indicator -->
+      <rect id="Tab-toggled-frame.element" x="201" y="241" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Tab-pressed">
+    <g id="Tab-pressed-interior">
+      <rect id="Tab-pressed-interior.element" x="302" y="242" width="96" height="56" rx="4" fill="#253040"/>
+    </g>
+    <g id="Tab-pressed-frame">
+      <rect id="Tab-pressed-frame.element" x="301" y="241" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Tab-disabled">
+    <g id="Tab-disabled-interior">
+      <rect id="Tab-disabled-interior.element" x="402" y="242" width="96" height="56" rx="4" fill="#272A2E" fill-opacity="0.5"/>
+    </g>
+    <g id="Tab-disabled-frame">
+      <rect id="Tab-disabled-frame.element" x="401" y="241" width="98" height="58" rx="5" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 5: TabBarBase (y=300) -->
+  <!-- ============================================================ -->
+  <g id="TabBarBase">
+    <g id="TabBarBase-interior">
+      <rect id="TabBarBase-interior.element" x="2" y="302" width="96" height="56" rx="4" fill="#272A2E"/>
+    </g>
+    <g id="TabBarBase-frame">
+      <rect id="TabBarBase-frame.element" x="1" y="301" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="TabBarBase-toggled">
+    <g id="TabBarBase-toggled-interior">
+      <rect id="TabBarBase-toggled-interior.element" x="102" y="302" width="96" height="56" rx="4" fill="#1A1D24"/>
+    </g>
+    <g id="TabBarBase-toggled-frame">
+      <rect id="TabBarBase-toggled-frame.element" x="101" y="301" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 6: TreeExpander (y=360) -->
+  <!-- ============================================================ -->
+  <g id="TreeExpander">
+    <g id="TreeExpander-interior">
+      <rect id="TreeExpander-interior.element" x="2" y="362" width="96" height="56" rx="4" fill="#222529"/>
+    </g>
+    <g id="TreeExpander-frame">
+      <rect id="TreeExpander-frame.element" x="1" y="361" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="TreeExpander-closed">
+    <g id="TreeExpander-closed-interior">
+      <rect id="TreeExpander-closed-interior.element" x="102" y="362" width="96" height="56" rx="4" fill="#222529"/>
+    </g>
+    <g id="TreeExpander-closed-frame">
+      <rect id="TreeExpander-closed-frame.element" x="101" y="361" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="TreeExpander-focused">
+    <g id="TreeExpander-focused-interior">
+      <rect id="TreeExpander-focused-interior.element" x="202" y="362" width="96" height="56" rx="4" fill="#222529"/>
+    </g>
+    <g id="TreeExpander-focused-frame">
+      <rect id="TreeExpander-focused-frame.element" x="201" y="361" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="TreeExpander-disabled">
+    <g id="TreeExpander-disabled-interior">
+      <rect id="TreeExpander-disabled-interior.element" x="302" y="362" width="96" height="56" rx="4" fill="#1E2125"/>
+    </g>
+    <g id="TreeExpander-disabled-frame">
+      <rect id="TreeExpander-disabled-frame.element" x="301" y="361" width="98" height="58" rx="5" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 7: HeaderSection / Header (y=420) -->
+  <!-- ============================================================ -->
+  <g id="HeaderSection">
+    <g id="HeaderSection-interior">
+      <rect id="HeaderSection-interior.element" x="2" y="422" width="96" height="56" rx="4" fill="#272A2E"/>
+    </g>
+    <g id="HeaderSection-frame">
+      <rect id="HeaderSection-frame.element" x="1" y="421" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="HeaderSection-focused">
+    <g id="HeaderSection-focused-interior">
+      <rect id="HeaderSection-focused-interior.element" x="102" y="422" width="96" height="56" rx="4" fill="#3D4A5F"/>
+    </g>
+    <g id="HeaderSection-focused-frame">
+      <rect id="HeaderSection-focused-frame.element" x="101" y="421" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="HeaderSection-pressed">
+    <g id="HeaderSection-pressed-interior">
+      <rect id="HeaderSection-pressed-interior.element" x="202" y="422" width="96" height="56" rx="4" fill="#253040"/>
+    </g>
+    <g id="HeaderSection-pressed-frame">
+      <rect id="HeaderSection-pressed-frame.element" x="201" y="421" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="HeaderSection-disabled">
+    <g id="HeaderSection-disabled-interior">
+      <rect id="HeaderSection-disabled-interior.element" x="302" y="422" width="96" height="56" rx="4" fill="#242830"/>
+    </g>
+    <g id="HeaderSection-disabled-frame">
+      <rect id="HeaderSection-disabled-frame.element" x="301" y="421" width="98" height="58" rx="5" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Header">
+    <g id="Header-interior">
+      <rect id="Header-interior.element" x="402" y="422" width="96" height="56" rx="4" fill="#272A2E"/>
+    </g>
+    <g id="Header-frame">
+      <rect id="Header-frame.element" x="401" y="421" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 8: SidePanel (y=480) -->
+  <!-- ============================================================ -->
+  <g id="SidePanel">
+    <g id="SidePanel-interior">
+      <rect id="SidePanel-interior.element" x="2" y="482" width="96" height="56" rx="4" fill="#222529"/>
+    </g>
+    <g id="SidePanel-frame">
+      <rect id="SidePanel-frame.element" x="1" y="481" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="SidePanel-focused">
+    <g id="SidePanel-focused-interior">
+      <rect id="SidePanel-focused-interior.element" x="102" y="482" width="96" height="56" rx="4" fill="#393B3F"/>
+    </g>
+    <g id="SidePanel-focused-frame">
+      <rect id="SidePanel-focused-frame.element" x="101" y="481" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 9: MenuItem / MenuBarItem (y=540) -->
+  <!-- ============================================================ -->
+  <!-- normal: transparent -->
+  <g id="MenuItem">
+    <g id="MenuItem-interior">
+      <rect id="MenuItem-interior.element" x="2" y="542" width="96" height="56" rx="4" fill="none"/>
+    </g>
+    <g id="MenuItem-frame">
+      <rect id="MenuItem-frame.element" x="1" y="541" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+  <!-- selected: ACCENT at 30% -->
+  <g id="MenuItem-selected">
+    <g id="MenuItem-selected-interior">
+      <rect id="MenuItem-selected-interior.element" x="102" y="542" width="96" height="56" rx="4" fill="#81A1C1" fill-opacity="0.3"/>
+    </g>
+    <g id="MenuItem-selected-frame">
+      <rect id="MenuItem-selected-frame.element" x="101" y="541" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="MenuItem-disabled">
+    <g id="MenuItem-disabled-interior">
+      <rect id="MenuItem-disabled-interior.element" x="202" y="542" width="96" height="56" rx="4" fill="none"/>
+    </g>
+    <g id="MenuItem-disabled-frame">
+      <rect id="MenuItem-disabled-frame.element" x="201" y="541" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+  <g id="MenuBarItem">
+    <g id="MenuBarItem-interior">
+      <rect id="MenuBarItem-interior.element" x="302" y="542" width="96" height="56" rx="4" fill="none"/>
+    </g>
+    <g id="MenuBarItem-frame">
+      <rect id="MenuBarItem-frame.element" x="301" y="541" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+  <g id="MenuBarItem-focused">
+    <g id="MenuBarItem-focused-interior">
+      <rect id="MenuBarItem-focused-interior.element" x="402" y="542" width="96" height="56" rx="4" fill="#81A1C1" fill-opacity="0.3"/>
+    </g>
+    <g id="MenuBarItem-focused-frame">
+      <rect id="MenuBarItem-focused-frame.element" x="401" y="541" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 10: LineEdit (y=600) -->
+  <!-- ============================================================ -->
+  <g id="LineEdit">
+    <g id="LineEdit-interior">
+      <rect id="LineEdit-interior.element" x="2" y="602" width="96" height="56" rx="4" fill="#222529"/>
+    </g>
+    <g id="LineEdit-frame">
+      <rect id="LineEdit-frame.element" x="1" y="601" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="LineEdit-focused">
+    <g id="LineEdit-focused-interior">
+      <rect id="LineEdit-focused-interior.element" x="102" y="602" width="96" height="56" rx="4" fill="#222529"/>
+    </g>
+    <g id="LineEdit-focused-frame">
+      <rect id="LineEdit-focused-frame.element" x="101" y="601" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="LineEdit-disabled">
+    <g id="LineEdit-disabled-interior">
+      <rect id="LineEdit-disabled-interior.element" x="202" y="602" width="96" height="56" rx="4" fill="#1E2125"/>
+    </g>
+    <g id="LineEdit-disabled-frame">
+      <rect id="LineEdit-disabled-frame.element" x="201" y="601" width="98" height="58" rx="5" fill="none" stroke="#303336" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 11: IndicatorSpinBox (y=660) -->
+  <!-- ============================================================ -->
+  <g id="IndicatorSpinBox">
+    <g id="IndicatorSpinBox-interior">
+      <rect id="IndicatorSpinBox-interior.element" x="2" y="662" width="96" height="56" rx="4" fill="#222529"/>
+    </g>
+    <g id="IndicatorSpinBox-frame">
+      <rect id="IndicatorSpinBox-frame.element" x="1" y="661" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="IndicatorSpinBox-focused">
+    <g id="IndicatorSpinBox-focused-interior">
+      <rect id="IndicatorSpinBox-focused-interior.element" x="102" y="662" width="96" height="56" rx="4" fill="#222529"/>
+    </g>
+    <g id="IndicatorSpinBox-focused-frame">
+      <rect id="IndicatorSpinBox-focused-frame.element" x="101" y="661" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="IndicatorSpinBox-disabled">
+    <g id="IndicatorSpinBox-disabled-interior">
+      <rect id="IndicatorSpinBox-disabled-interior.element" x="202" y="662" width="96" height="56" rx="4" fill="#1E2125"/>
+    </g>
+    <g id="IndicatorSpinBox-disabled-frame">
+      <rect id="IndicatorSpinBox-disabled-frame.element" x="201" y="661" width="98" height="58" rx="5" fill="none" stroke="#303336" stroke-width="1"/>
+    </g>
+  </g>
+  <!-- up arrow button normal -->
+  <g id="IndicatorSpinBox-up">
+    <g id="IndicatorSpinBox-up-interior">
+      <rect id="IndicatorSpinBox-up-interior.element" x="302" y="662" width="96" height="26" rx="3" fill="#333E4F"/>
+    </g>
+    <g id="IndicatorSpinBox-up-frame">
+      <rect id="IndicatorSpinBox-up-frame.element" x="301" y="661" width="98" height="28" rx="4" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="IndicatorSpinBox-up-focused">
+    <g id="IndicatorSpinBox-up-focused-interior">
+      <rect id="IndicatorSpinBox-up-focused-interior.element" x="402" y="662" width="96" height="26" rx="3" fill="#3D4A5F"/>
+    </g>
+    <g id="IndicatorSpinBox-up-focused-frame">
+      <rect id="IndicatorSpinBox-up-focused-frame.element" x="401" y="661" width="98" height="28" rx="4" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="IndicatorSpinBox-up-pressed">
+    <g id="IndicatorSpinBox-up-pressed-interior">
+      <rect id="IndicatorSpinBox-up-pressed-interior.element" x="502" y="662" width="96" height="26" rx="3" fill="#253040"/>
+    </g>
+    <g id="IndicatorSpinBox-up-pressed-frame">
+      <rect id="IndicatorSpinBox-up-pressed-frame.element" x="501" y="661" width="98" height="28" rx="4" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <!-- down arrow button -->
+  <g id="IndicatorSpinBox-down">
+    <g id="IndicatorSpinBox-down-interior">
+      <rect id="IndicatorSpinBox-down-interior.element" x="302" y="690" width="96" height="26" rx="3" fill="#333E4F"/>
+    </g>
+    <g id="IndicatorSpinBox-down-frame">
+      <rect id="IndicatorSpinBox-down-frame.element" x="301" y="689" width="98" height="28" rx="4" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="IndicatorSpinBox-down-focused">
+    <g id="IndicatorSpinBox-down-focused-interior">
+      <rect id="IndicatorSpinBox-down-focused-interior.element" x="402" y="690" width="96" height="26" rx="3" fill="#3D4A5F"/>
+    </g>
+    <g id="IndicatorSpinBox-down-focused-frame">
+      <rect id="IndicatorSpinBox-down-focused-frame.element" x="401" y="689" width="98" height="28" rx="4" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="IndicatorSpinBox-down-pressed">
+    <g id="IndicatorSpinBox-down-pressed-interior">
+      <rect id="IndicatorSpinBox-down-pressed-interior.element" x="502" y="690" width="96" height="26" rx="3" fill="#253040"/>
+    </g>
+    <g id="IndicatorSpinBox-down-pressed-frame">
+      <rect id="IndicatorSpinBox-down-pressed-frame.element" x="501" y="689" width="98" height="28" rx="4" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 12: DropDownButton / ComboBox (y=720) -->
+  <!-- ============================================================ -->
+  <g id="DropDownButton">
+    <g id="DropDownButton-interior">
+      <rect id="DropDownButton-interior.element" x="2" y="722" width="96" height="56" rx="4" fill="#333E4F"/>
+    </g>
+    <g id="DropDownButton-frame">
+      <rect id="DropDownButton-frame.element" x="1" y="721" width="98" height="58" rx="5" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="DropDownButton-focused">
+    <g id="DropDownButton-focused-interior">
+      <rect id="DropDownButton-focused-interior.element" x="102" y="722" width="96" height="56" rx="4" fill="#3D4A5F"/>
+    </g>
+    <g id="DropDownButton-focused-frame">
+      <rect id="DropDownButton-focused-frame.element" x="101" y="721" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="DropDownButton-pressed">
+    <g id="DropDownButton-pressed-interior">
+      <rect id="DropDownButton-pressed-interior.element" x="202" y="722" width="96" height="56" rx="4" fill="#253040"/>
+    </g>
+    <g id="DropDownButton-pressed-frame">
+      <rect id="DropDownButton-pressed-frame.element" x="201" y="721" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="DropDownButton-disabled">
+    <g id="DropDownButton-disabled-interior">
+      <rect id="DropDownButton-disabled-interior.element" x="302" y="722" width="96" height="56" rx="4" fill="#242830"/>
+    </g>
+    <g id="DropDownButton-disabled-frame">
+      <rect id="DropDownButton-disabled-frame.element" x="301" y="721" width="98" height="58" rx="5" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="ComboBox">
+    <g id="ComboBox-interior">
+      <rect id="ComboBox-interior.element" x="402" y="722" width="96" height="56" rx="4" fill="#222529"/>
+    </g>
+    <g id="ComboBox-frame">
+      <rect id="ComboBox-frame.element" x="401" y="721" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="ComboBox-focused">
+    <g id="ComboBox-focused-interior">
+      <rect id="ComboBox-focused-interior.element" x="502" y="722" width="96" height="56" rx="4" fill="#222529"/>
+    </g>
+    <g id="ComboBox-focused-frame">
+      <rect id="ComboBox-focused-frame.element" x="501" y="721" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="ComboBox-pressed">
+    <g id="ComboBox-pressed-interior">
+      <rect id="ComboBox-pressed-interior.element" x="602" y="722" width="96" height="56" rx="4" fill="#253040"/>
+    </g>
+    <g id="ComboBox-pressed-frame">
+      <rect id="ComboBox-pressed-frame.element" x="601" y="721" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 13: ComboBox-disabled / Frame (y=780) -->
+  <!-- ============================================================ -->
+  <g id="ComboBox-disabled">
+    <g id="ComboBox-disabled-interior">
+      <rect id="ComboBox-disabled-interior.element" x="2" y="782" width="96" height="56" rx="4" fill="#1E2125"/>
+    </g>
+    <g id="ComboBox-disabled-frame">
+      <rect id="ComboBox-disabled-frame.element" x="1" y="781" width="98" height="58" rx="5" fill="none" stroke="#303336" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Frame">
+    <g id="Frame-interior">
+      <rect id="Frame-interior.element" x="102" y="782" width="96" height="56" rx="4" fill="#1A1D24"/>
+    </g>
+    <g id="Frame-frame">
+      <rect id="Frame-frame.element" x="101" y="781" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Frame-focused">
+    <g id="Frame-focused-interior">
+      <rect id="Frame-focused-interior.element" x="202" y="782" width="96" height="56" rx="4" fill="#1A1D24"/>
+    </g>
+    <g id="Frame-focused-frame">
+      <rect id="Frame-focused-frame.element" x="201" y="781" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="GroupBox">
+    <g id="GroupBox-interior">
+      <rect id="GroupBox-interior.element" x="302" y="782" width="96" height="56" rx="4" fill="#1A1D24"/>
+    </g>
+    <g id="GroupBox-frame">
+      <rect id="GroupBox-frame.element" x="301" y="781" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="GroupBox-focused">
+    <g id="GroupBox-focused-interior">
+      <rect id="GroupBox-focused-interior.element" x="402" y="782" width="96" height="56" rx="4" fill="#1A1D24"/>
+    </g>
+    <g id="GroupBox-focused-frame">
+      <rect id="GroupBox-focused-frame.element" x="401" y="781" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="GroupBox-disabled">
+    <g id="GroupBox-disabled-interior">
+      <rect id="GroupBox-disabled-interior.element" x="502" y="782" width="96" height="56" rx="4" fill="#1E2125"/>
+    </g>
+    <g id="GroupBox-disabled-frame">
+      <rect id="GroupBox-disabled-frame.element" x="501" y="781" width="98" height="58" rx="5" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 14: ScrollbarGroove (y=840) -->
+  <!-- ============================================================ -->
+  <g id="ScrollbarGroove">
+    <g id="ScrollbarGroove-interior">
+      <rect id="ScrollbarGroove-interior.element" x="42" y="842" width="16" height="56" rx="4" fill="#101216"/>
+    </g>
+    <g id="ScrollbarGroove-frame">
+      <rect id="ScrollbarGroove-frame.element" x="1" y="841" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+  <g id="ScrollbarGroove-horizontal">
+    <g id="ScrollbarGroove-horizontal-interior">
+      <rect id="ScrollbarGroove-horizontal-interior.element" x="102" y="858" width="96" height="16" rx="4" fill="#101216"/>
+    </g>
+    <g id="ScrollbarGroove-horizontal-frame">
+      <rect id="ScrollbarGroove-horizontal-frame.element" x="101" y="841" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 15: ScrollbarSlider (y=900) -->
+  <!-- ============================================================ -->
+  <g id="ScrollbarSlider">
+    <g id="ScrollbarSlider-interior">
+      <rect id="ScrollbarSlider-interior.element" x="42" y="902" width="16" height="56" rx="4" fill="#333E4F"/>
+    </g>
+    <g id="ScrollbarSlider-frame">
+      <rect id="ScrollbarSlider-frame.element" x="41" y="901" width="18" height="58" rx="5" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="ScrollbarSlider-focused">
+    <g id="ScrollbarSlider-focused-interior">
+      <rect id="ScrollbarSlider-focused-interior.element" x="142" y="902" width="16" height="56" rx="4" fill="#3D4A5F"/>
+    </g>
+    <g id="ScrollbarSlider-focused-frame">
+      <rect id="ScrollbarSlider-focused-frame.element" x="141" y="901" width="18" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="ScrollbarSlider-pressed">
+    <g id="ScrollbarSlider-pressed-interior">
+      <rect id="ScrollbarSlider-pressed-interior.element" x="242" y="902" width="16" height="56" rx="4" fill="#253040"/>
+    </g>
+    <g id="ScrollbarSlider-pressed-frame">
+      <rect id="ScrollbarSlider-pressed-frame.element" x="241" y="901" width="18" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="ScrollbarSlider-horizontal">
+    <g id="ScrollbarSlider-horizontal-interior">
+      <rect id="ScrollbarSlider-horizontal-interior.element" x="302" y="918" width="96" height="16" rx="4" fill="#333E4F"/>
+    </g>
+    <g id="ScrollbarSlider-horizontal-frame">
+      <rect id="ScrollbarSlider-horizontal-frame.element" x="301" y="917" width="98" height="18" rx="5" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="ScrollbarSlider-horizontal-focused">
+    <g id="ScrollbarSlider-horizontal-focused-interior">
+      <rect id="ScrollbarSlider-horizontal-focused-interior.element" x="402" y="918" width="96" height="16" rx="4" fill="#3D4A5F"/>
+    </g>
+    <g id="ScrollbarSlider-horizontal-focused-frame">
+      <rect id="ScrollbarSlider-horizontal-focused-frame.element" x="401" y="917" width="98" height="18" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="ScrollbarSlider-horizontal-pressed">
+    <g id="ScrollbarSlider-horizontal-pressed-interior">
+      <rect id="ScrollbarSlider-horizontal-pressed-interior.element" x="502" y="918" width="96" height="16" rx="4" fill="#253040"/>
+    </g>
+    <g id="ScrollbarSlider-horizontal-pressed-frame">
+      <rect id="ScrollbarSlider-horizontal-pressed-frame.element" x="501" y="917" width="98" height="18" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 16: Scrollbar arrows (y=960) -->
+  <!-- ============================================================ -->
+  <g id="Scrollbarrow-up">
+    <g id="Scrollbarrow-up-interior">
+      <rect id="Scrollbarrow-up-interior.element" x="2" y="962" width="96" height="56" rx="4" fill="#333E4F"/>
+    </g>
+    <g id="Scrollbarrow-up-frame">
+      <rect id="Scrollbarrow-up-frame.element" x="1" y="961" width="98" height="58" rx="5" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Scrollbarrow-up-focused">
+    <g id="Scrollbarrow-up-focused-interior">
+      <rect id="Scrollbarrow-up-focused-interior.element" x="102" y="962" width="96" height="56" rx="4" fill="#3D4A5F"/>
+    </g>
+    <g id="Scrollbarrow-up-focused-frame">
+      <rect id="Scrollbarrow-up-focused-frame.element" x="101" y="961" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Scrollbarrow-up-pressed">
+    <g id="Scrollbarrow-up-pressed-interior">
+      <rect id="Scrollbarrow-up-pressed-interior.element" x="202" y="962" width="96" height="56" rx="4" fill="#253040"/>
+    </g>
+    <g id="Scrollbarrow-up-pressed-frame">
+      <rect id="Scrollbarrow-up-pressed-frame.element" x="201" y="961" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Scrollbarrow-up-disabled">
+    <g id="Scrollbarrow-up-disabled-interior">
+      <rect id="Scrollbarrow-up-disabled-interior.element" x="302" y="962" width="96" height="56" rx="4" fill="#242830"/>
+    </g>
+    <g id="Scrollbarrow-up-disabled-frame">
+      <rect id="Scrollbarrow-up-disabled-frame.element" x="301" y="961" width="98" height="58" rx="5" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 17: Scrollbar down arrow (y=1020) -->
+  <!-- ============================================================ -->
+  <g id="Scrollbarrow-down">
+    <g id="Scrollbarrow-down-interior">
+      <rect id="Scrollbarrow-down-interior.element" x="2" y="1022" width="96" height="56" rx="4" fill="#333E4F"/>
+    </g>
+    <g id="Scrollbarrow-down-frame">
+      <rect id="Scrollbarrow-down-frame.element" x="1" y="1021" width="98" height="58" rx="5" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Scrollbarrow-down-focused">
+    <g id="Scrollbarrow-down-focused-interior">
+      <rect id="Scrollbarrow-down-focused-interior.element" x="102" y="1022" width="96" height="56" rx="4" fill="#3D4A5F"/>
+    </g>
+    <g id="Scrollbarrow-down-focused-frame">
+      <rect id="Scrollbarrow-down-focused-frame.element" x="101" y="1021" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Scrollbarrow-down-pressed">
+    <g id="Scrollbarrow-down-pressed-interior">
+      <rect id="Scrollbarrow-down-pressed-interior.element" x="202" y="1022" width="96" height="56" rx="4" fill="#253040"/>
+    </g>
+    <g id="Scrollbarrow-down-pressed-frame">
+      <rect id="Scrollbarrow-down-pressed-frame.element" x="201" y="1021" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Scrollbarrow-down-disabled">
+    <g id="Scrollbarrow-down-disabled-interior">
+      <rect id="Scrollbarrow-down-disabled-interior.element" x="302" y="1022" width="96" height="56" rx="4" fill="#242830"/>
+    </g>
+    <g id="Scrollbarrow-down-disabled-frame">
+      <rect id="Scrollbarrow-down-disabled-frame.element" x="301" y="1021" width="98" height="58" rx="5" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 18: Scrollbar left arrow (y=1080) -->
+  <!-- ============================================================ -->
+  <g id="Scrollbarrow-left">
+    <g id="Scrollbarrow-left-interior">
+      <rect id="Scrollbarrow-left-interior.element" x="2" y="1082" width="96" height="56" rx="4" fill="#333E4F"/>
+    </g>
+    <g id="Scrollbarrow-left-frame">
+      <rect id="Scrollbarrow-left-frame.element" x="1" y="1081" width="98" height="58" rx="5" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Scrollbarrow-left-focused">
+    <g id="Scrollbarrow-left-focused-interior">
+      <rect id="Scrollbarrow-left-focused-interior.element" x="102" y="1082" width="96" height="56" rx="4" fill="#3D4A5F"/>
+    </g>
+    <g id="Scrollbarrow-left-focused-frame">
+      <rect id="Scrollbarrow-left-focused-frame.element" x="101" y="1081" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Scrollbarrow-left-pressed">
+    <g id="Scrollbarrow-left-pressed-interior">
+      <rect id="Scrollbarrow-left-pressed-interior.element" x="202" y="1082" width="96" height="56" rx="4" fill="#253040"/>
+    </g>
+    <g id="Scrollbarrow-left-pressed-frame">
+      <rect id="Scrollbarrow-left-pressed-frame.element" x="201" y="1081" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Scrollbarrow-left-disabled">
+    <g id="Scrollbarrow-left-disabled-interior">
+      <rect id="Scrollbarrow-left-disabled-interior.element" x="302" y="1082" width="96" height="56" rx="4" fill="#242830"/>
+    </g>
+    <g id="Scrollbarrow-left-disabled-frame">
+      <rect id="Scrollbarrow-left-disabled-frame.element" x="301" y="1081" width="98" height="58" rx="5" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 19: Scrollbar right arrow (y=1140) -->
+  <!-- ============================================================ -->
+  <g id="Scrollbarrow-right">
+    <g id="Scrollbarrow-right-interior">
+      <rect id="Scrollbarrow-right-interior.element" x="2" y="1142" width="96" height="56" rx="4" fill="#333E4F"/>
+    </g>
+    <g id="Scrollbarrow-right-frame">
+      <rect id="Scrollbarrow-right-frame.element" x="1" y="1141" width="98" height="58" rx="5" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Scrollbarrow-right-focused">
+    <g id="Scrollbarrow-right-focused-interior">
+      <rect id="Scrollbarrow-right-focused-interior.element" x="102" y="1142" width="96" height="56" rx="4" fill="#3D4A5F"/>
+    </g>
+    <g id="Scrollbarrow-right-focused-frame">
+      <rect id="Scrollbarrow-right-focused-frame.element" x="101" y="1141" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Scrollbarrow-right-pressed">
+    <g id="Scrollbarrow-right-pressed-interior">
+      <rect id="Scrollbarrow-right-pressed-interior.element" x="202" y="1142" width="96" height="56" rx="4" fill="#253040"/>
+    </g>
+    <g id="Scrollbarrow-right-pressed-frame">
+      <rect id="Scrollbarrow-right-pressed-frame.element" x="201" y="1141" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Scrollbarrow-right-disabled">
+    <g id="Scrollbarrow-right-disabled-interior">
+      <rect id="Scrollbarrow-right-disabled-interior.element" x="302" y="1142" width="96" height="56" rx="4" fill="#242830"/>
+    </g>
+    <g id="Scrollbarrow-right-disabled-frame">
+      <rect id="Scrollbarrow-right-disabled-frame.element" x="301" y="1141" width="98" height="58" rx="5" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 20: Slider (y=1200) -->
+  <!-- ============================================================ -->
+  <g id="Slider">
+    <g id="Slider-interior">
+      <rect id="Slider-interior.element" x="2" y="1218" width="96" height="4" rx="2" fill="#333E4F"/>
+    </g>
+    <g id="Slider-frame">
+      <rect id="Slider-frame.element" x="1" y="1201" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+  <g id="Slider-focused">
+    <g id="Slider-focused-interior">
+      <rect id="Slider-focused-interior.element" x="102" y="1218" width="96" height="4" rx="2" fill="#3D4A5F"/>
+    </g>
+    <g id="Slider-focused-frame">
+      <rect id="Slider-focused-frame.element" x="101" y="1201" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+  <g id="Slider-pressed">
+    <g id="Slider-pressed-interior">
+      <rect id="Slider-pressed-interior.element" x="202" y="1218" width="96" height="4" rx="2" fill="#81A1C1"/>
+    </g>
+    <g id="Slider-pressed-frame">
+      <rect id="Slider-pressed-frame.element" x="201" y="1201" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+  <g id="Slider-ticksabove">
+    <g id="Slider-ticksabove-interior">
+      <rect id="Slider-ticksabove-interior.element" x="302" y="1225" width="96" height="4" rx="2" fill="#333E4F"/>
+    </g>
+    <g id="Slider-ticksabove-frame">
+      <rect id="Slider-ticksabove-frame.element" x="301" y="1201" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+  <g id="Slider-ticksbelow">
+    <g id="Slider-ticksbelow-interior">
+      <rect id="Slider-ticksbelow-interior.element" x="402" y="1212" width="96" height="4" rx="2" fill="#333E4F"/>
+    </g>
+    <g id="Slider-ticksbelow-frame">
+      <rect id="Slider-ticksbelow-frame.element" x="401" y="1201" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 21: SliderCursor (y=1260) -->
+  <!-- ============================================================ -->
+  <g id="SliderCursor">
+    <g id="SliderCursor-interior">
+      <rect id="SliderCursor-interior.element" x="41" y="1262" width="18" height="18" rx="9" fill="#333E4F"/>
+    </g>
+    <g id="SliderCursor-frame">
+      <rect id="SliderCursor-frame.element" x="40" y="1261" width="20" height="20" rx="10" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="SliderCursor-focused">
+    <g id="SliderCursor-focused-interior">
+      <rect id="SliderCursor-focused-interior.element" x="141" y="1262" width="18" height="18" rx="9" fill="#3D4A5F"/>
+    </g>
+    <g id="SliderCursor-focused-frame">
+      <rect id="SliderCursor-focused-frame.element" x="140" y="1261" width="20" height="20" rx="10" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="SliderCursor-pressed">
+    <g id="SliderCursor-pressed-interior">
+      <rect id="SliderCursor-pressed-interior.element" x="241" y="1262" width="18" height="18" rx="9" fill="#81A1C1"/>
+    </g>
+    <g id="SliderCursor-pressed-frame">
+      <rect id="SliderCursor-pressed-frame.element" x="240" y="1261" width="20" height="20" rx="10" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="SliderCursor-above">
+    <g id="SliderCursor-above-interior">
+      <rect id="SliderCursor-above-interior.element" x="341" y="1262" width="18" height="18" rx="9" fill="#333E4F"/>
+    </g>
+    <g id="SliderCursor-above-frame">
+      <rect id="SliderCursor-above-frame.element" x="340" y="1261" width="20" height="20" rx="10" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="SliderCursor-below">
+    <g id="SliderCursor-below-interior">
+      <rect id="SliderCursor-below-interior.element" x="441" y="1262" width="18" height="18" rx="9" fill="#333E4F"/>
+    </g>
+    <g id="SliderCursor-below-frame">
+      <rect id="SliderCursor-below-frame.element" x="440" y="1261" width="20" height="20" rx="10" fill="none" stroke="#4A5B70" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 22: ProgressbarContents / Progressbar (y=1320) -->
+  <!-- ============================================================ -->
+  <g id="ProgressbarContents">
+    <g id="ProgressbarContents-interior">
+      <rect id="ProgressbarContents-interior.element" x="2" y="1334" width="96" height="12" rx="2" fill="#81A1C1"/>
+    </g>
+    <g id="ProgressbarContents-frame">
+      <rect id="ProgressbarContents-frame.element" x="1" y="1321" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+  <g id="ProgressbarContents-horizontal">
+    <g id="ProgressbarContents-horizontal-interior">
+      <rect id="ProgressbarContents-horizontal-interior.element" x="102" y="1334" width="96" height="12" rx="2" fill="#81A1C1"/>
+    </g>
+    <g id="ProgressbarContents-horizontal-frame">
+      <rect id="ProgressbarContents-horizontal-frame.element" x="101" y="1321" width="98" height="58" rx="5" fill="none" stroke="none"/>
+    </g>
+  </g>
+  <g id="Progressbar">
+    <g id="Progressbar-interior">
+      <rect id="Progressbar-interior.element" x="202" y="1334" width="96" height="12" rx="2" fill="#101216"/>
+    </g>
+    <g id="Progressbar-frame">
+      <rect id="Progressbar-frame.element" x="201" y="1333" width="98" height="14" rx="3" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Progressbar-horizontal">
+    <g id="Progressbar-horizontal-interior">
+      <rect id="Progressbar-horizontal-interior.element" x="302" y="1334" width="96" height="12" rx="2" fill="#101216"/>
+    </g>
+    <g id="Progressbar-horizontal-frame">
+      <rect id="Progressbar-horizontal-frame.element" x="301" y="1333" width="98" height="14" rx="3" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 23: CheckBox (y=1380) -->
+  <!-- ============================================================ -->
+  <g id="CheckBox">
+    <g id="CheckBox-interior">
+      <rect id="CheckBox-interior.element" x="37" y="1382" width="26" height="26" rx="4" fill="#222529"/>
+    </g>
+    <g id="CheckBox-frame">
+      <rect id="CheckBox-frame.element" x="36" y="1381" width="28" height="28" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="CheckBox-focused">
+    <g id="CheckBox-focused-interior">
+      <rect id="CheckBox-focused-interior.element" x="137" y="1382" width="26" height="26" rx="4" fill="#222529"/>
+    </g>
+    <g id="CheckBox-focused-frame">
+      <rect id="CheckBox-focused-frame.element" x="136" y="1381" width="28" height="28" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="CheckBox-pressed">
+    <g id="CheckBox-pressed-interior">
+      <rect id="CheckBox-pressed-interior.element" x="237" y="1382" width="26" height="26" rx="4" fill="#253040"/>
+    </g>
+    <g id="CheckBox-pressed-frame">
+      <rect id="CheckBox-pressed-frame.element" x="236" y="1381" width="28" height="28" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="CheckBox-toggled">
+    <g id="CheckBox-toggled-interior">
+      <rect id="CheckBox-toggled-interior.element" x="337" y="1382" width="26" height="26" rx="4" fill="#81A1C1"/>
+    </g>
+    <g id="CheckBox-toggled-frame">
+      <rect id="CheckBox-toggled-frame.element" x="336" y="1381" width="28" height="28" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="CheckBox-disabled">
+    <g id="CheckBox-disabled-interior">
+      <rect id="CheckBox-disabled-interior.element" x="437" y="1382" width="26" height="26" rx="4" fill="#1E2125"/>
+    </g>
+    <g id="CheckBox-disabled-frame">
+      <rect id="CheckBox-disabled-frame.element" x="436" y="1381" width="28" height="28" rx="5" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 24: CheckBox toggled states (y=1440) -->
+  <!-- ============================================================ -->
+  <g id="CheckBox-toggled-focused">
+    <g id="CheckBox-toggled-focused-interior">
+      <rect id="CheckBox-toggled-focused-interior.element" x="2" y="1442" width="26" height="26" rx="4" fill="#81A1C1"/>
+    </g>
+    <g id="CheckBox-toggled-focused-frame">
+      <rect id="CheckBox-toggled-focused-frame.element" x="1" y="1441" width="28" height="28" rx="5" fill="none" stroke="#81A1C1" stroke-width="2"/>
+    </g>
+  </g>
+  <g id="CheckBox-toggled-pressed">
+    <g id="CheckBox-toggled-pressed-interior">
+      <rect id="CheckBox-toggled-pressed-interior.element" x="102" y="1442" width="26" height="26" rx="4" fill="#5E7B9A"/>
+    </g>
+    <g id="CheckBox-toggled-pressed-frame">
+      <rect id="CheckBox-toggled-pressed-frame.element" x="101" y="1441" width="28" height="28" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="CheckBox-toggled-disabled">
+    <g id="CheckBox-toggled-disabled-interior">
+      <rect id="CheckBox-toggled-disabled-interior.element" x="202" y="1442" width="26" height="26" rx="4" fill="#4A6070"/>
+    </g>
+    <g id="CheckBox-toggled-disabled-frame">
+      <rect id="CheckBox-toggled-disabled-frame.element" x="201" y="1441" width="28" height="28" rx="5" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+  <!-- CheckBoxFocus -->
+  <g id="CheckBoxFocus">
+    <g id="CheckBoxFocus-interior">
+      <rect id="CheckBoxFocus-interior.element" x="302" y="1442" width="26" height="26" rx="4" fill="none"/>
+    </g>
+    <g id="CheckBoxFocus-frame">
+      <rect id="CheckBoxFocus-frame.element" x="300" y="1440" width="30" height="30" rx="6" fill="none" stroke="#81A1C1" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 25: RadioButton (y=1500) -->
+  <!-- ============================================================ -->
+  <g id="RadioButton">
+    <g id="RadioButton-interior">
+      <circle id="RadioButton-interior.element" cx="50" cy="1529" r="13" fill="#222529"/>
+    </g>
+    <g id="RadioButton-frame">
+      <circle id="RadioButton-frame.element" cx="50" cy="1529" r="14" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="RadioButton-focused">
+    <g id="RadioButton-focused-interior">
+      <circle id="RadioButton-focused-interior.element" cx="150" cy="1529" r="13" fill="#222529"/>
+    </g>
+    <g id="RadioButton-focused-frame">
+      <circle id="RadioButton-focused-frame.element" cx="150" cy="1529" r="14" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="RadioButton-pressed">
+    <g id="RadioButton-pressed-interior">
+      <circle id="RadioButton-pressed-interior.element" cx="250" cy="1529" r="13" fill="#253040"/>
+    </g>
+    <g id="RadioButton-pressed-frame">
+      <circle id="RadioButton-pressed-frame.element" cx="250" cy="1529" r="14" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="RadioButton-toggled">
+    <g id="RadioButton-toggled-interior">
+      <circle id="RadioButton-toggled-interior.element" cx="350" cy="1529" r="13" fill="#81A1C1"/>
+    </g>
+    <g id="RadioButton-toggled-frame">
+      <circle id="RadioButton-toggled-frame.element" cx="350" cy="1529" r="14" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="RadioButton-disabled">
+    <g id="RadioButton-disabled-interior">
+      <circle id="RadioButton-disabled-interior.element" cx="450" cy="1529" r="13" fill="#1E2125"/>
+    </g>
+    <g id="RadioButton-disabled-frame">
+      <circle id="RadioButton-disabled-frame.element" cx="450" cy="1529" r="14" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 26: RadioButton toggled states (y=1560) -->
+  <!-- ============================================================ -->
+  <g id="RadioButton-toggled-focused">
+    <g id="RadioButton-toggled-focused-interior">
+      <circle id="RadioButton-toggled-focused-interior.element" cx="50" cy="1589" r="13" fill="#81A1C1"/>
+    </g>
+    <g id="RadioButton-toggled-focused-frame">
+      <circle id="RadioButton-toggled-focused-frame.element" cx="50" cy="1589" r="14" fill="none" stroke="#81A1C1" stroke-width="2"/>
+    </g>
+  </g>
+  <g id="RadioButton-toggled-pressed">
+    <g id="RadioButton-toggled-pressed-interior">
+      <circle id="RadioButton-toggled-pressed-interior.element" cx="150" cy="1589" r="13" fill="#5E7B9A"/>
+    </g>
+    <g id="RadioButton-toggled-pressed-frame">
+      <circle id="RadioButton-toggled-pressed-frame.element" cx="150" cy="1589" r="14" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="RadioButton-toggled-disabled">
+    <g id="RadioButton-toggled-disabled-interior">
+      <circle id="RadioButton-toggled-disabled-interior.element" cx="250" cy="1589" r="13" fill="#4A6070"/>
+    </g>
+    <g id="RadioButton-toggled-disabled-frame">
+      <circle id="RadioButton-toggled-disabled-frame.element" cx="250" cy="1589" r="14" fill="none" stroke="#363840" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 27: ToolboxTab (y=1620) -->
+  <!-- ============================================================ -->
+  <g id="ToolboxTab">
+    <g id="ToolboxTab-interior">
+      <rect id="ToolboxTab-interior.element" x="2" y="1622" width="96" height="56" rx="4" fill="#272A2E"/>
+    </g>
+    <g id="ToolboxTab-frame">
+      <rect id="ToolboxTab-frame.element" x="1" y="1621" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="ToolboxTab-focused">
+    <g id="ToolboxTab-focused-interior">
+      <rect id="ToolboxTab-focused-interior.element" x="102" y="1622" width="96" height="56" rx="4" fill="#272A2E"/>
+    </g>
+    <g id="ToolboxTab-focused-frame">
+      <rect id="ToolboxTab-focused-frame.element" x="101" y="1621" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="ToolboxTab-pressed">
+    <g id="ToolboxTab-pressed-interior">
+      <rect id="ToolboxTab-pressed-interior.element" x="202" y="1622" width="96" height="56" rx="4" fill="#253040"/>
+    </g>
+    <g id="ToolboxTab-pressed-frame">
+      <rect id="ToolboxTab-pressed-frame.element" x="201" y="1621" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="ToolboxTab-toggled">
+    <g id="ToolboxTab-toggled-interior">
+      <rect id="ToolboxTab-toggled-interior.element" x="302" y="1622" width="96" height="56" rx="4" fill="#1A1D24"/>
+    </g>
+    <g id="ToolboxTab-toggled-frame">
+      <rect id="ToolboxTab-toggled-frame.element" x="301" y="1621" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 28: Dialog / Tooltip (y=1680) -->
+  <!-- ============================================================ -->
+  <g id="Dialog">
+    <g id="Dialog-interior">
+      <rect id="Dialog-interior.element" x="2" y="1682" width="96" height="56" rx="4" fill="#1A1D24"/>
+    </g>
+    <g id="Dialog-frame">
+      <rect id="Dialog-frame.element" x="1" y="1681" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="Tooltip">
+    <g id="Tooltip-interior">
+      <rect id="Tooltip-interior.element" x="102" y="1682" width="96" height="56" rx="4" fill="#272A2E"/>
+    </g>
+    <g id="Tooltip-frame">
+      <rect id="Tooltip-frame.element" x="101" y="1681" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- ROW 29: SelectionItem / ItemView (y=1740) -->
+  <!-- ============================================================ -->
+  <g id="SelectionItem">
+    <g id="SelectionItem-interior">
+      <rect id="SelectionItem-interior.element" x="2" y="1742" width="96" height="56" rx="4" fill="#81A1C1" fill-opacity="0.3"/>
+    </g>
+    <g id="SelectionItem-frame">
+      <rect id="SelectionItem-frame.element" x="1" y="1741" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="SelectionItem-pressed">
+    <g id="SelectionItem-pressed-interior">
+      <rect id="SelectionItem-pressed-interior.element" x="102" y="1742" width="96" height="56" rx="4" fill="#81A1C1" fill-opacity="0.5"/>
+    </g>
+    <g id="SelectionItem-pressed-frame">
+      <rect id="SelectionItem-pressed-frame.element" x="101" y="1741" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="ItemView">
+    <g id="ItemView-interior">
+      <rect id="ItemView-interior.element" x="202" y="1742" width="96" height="56" rx="4" fill="#222529"/>
+    </g>
+    <g id="ItemView-frame">
+      <rect id="ItemView-frame.element" x="201" y="1741" width="98" height="58" rx="5" fill="none" stroke="#38393E" stroke-width="1"/>
+    </g>
+  </g>
+  <g id="ItemView-focused">
+    <g id="ItemView-focused-interior">
+      <rect id="ItemView-focused-interior.element" x="302" y="1742" width="96" height="56" rx="4" fill="#222529"/>
+    </g>
+    <g id="ItemView-focused-frame">
+      <rect id="ItemView-focused-frame.element" x="301" y="1741" width="98" height="58" rx="5" fill="none" stroke="#81A1C1" stroke-width="1"/>
+    </g>
+  </g>
+
+</svg>

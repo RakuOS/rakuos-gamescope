@@ -20,7 +20,7 @@ variables:
   IMAGE_REGISTRY_QUAY_NVIDIA: "quay.io/rakuos/rakuos-kde-nvidia"
   DEFAULT_TAG: "latest"
   IMAGE_DESC: "RakuOS KDE"
-  IMAGE_KEYWORDS: "bootc,fedora,atomic,kde"
+  IMAGE_KEYWORDS: "bootc,fedora,atomic,kde,plasma"
 
 stages:
   - build

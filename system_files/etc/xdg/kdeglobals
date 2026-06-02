@@ -1,8 +1,21 @@
 [KDE]
-LookAndFeelPackage=org.kde.breezedark.desktop
+LookAndFeelPackage=org.rakuos.OrigamiPaper
+widgetStyle=breeze
+
+[General]
+ColorScheme=OrigamiPaperDark
+
+[Icons]
+Theme=WhiteSur-dark
+
+[General]
+fixed=Maple Mono NF,11,-1,5,50,0,0,0,0,0
+font=Inter,11,-1,5,50,0,0,0,0,0
+menuFont=Inter,11,-1,5,50,0,0,0,0,0
+smallestReadableFont=Inter,9,-1,5,50,0,0,0,0,0
+toolBarFont=Inter,10,-1,5,50,0,0,0,0,0
 
 [GTK]
-GTK2Theme=Breeze-Dark
-GTK3Theme=Breeze-Dark
-GTK4Theme=Breeze-Dark
-IconTheme=Breeze
+GTK2Theme=OrigamiPaper
+GTK3Theme=OrigamiPaper
+GTK4Theme=OrigamiPaper

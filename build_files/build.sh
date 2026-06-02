@@ -5,29 +5,58 @@ FEDORA_VERSION=$(rpm -E %fedora)
 
 ## Install packages
 dnf5.real -y install @fonts @hardware-support \
-  plasma-desktop \
-  plasma-workspace \
-  plasma-workspace-wayland \
-  plasma-browser-integration \
-  kscreen \
-  plasma-login-manager \
-  kwin \
-  kmenuedit \
-  kinfocenter \
-  plasma-nm \
-  plasma-pa \
-  kdegraphics-thumbnailers \
-  breeze-icon-theme \
-  breeze-gtk \
+  akonadi-server \
+  akonadi-server-mysql \
+  ark \
   bluedevil \
   bluez \
   bluez-obexd \
-  kde-gtk-config \
+  bluez-cups \
+  breeze-gtk \
+  breeze-icon-theme \
+  dolphin \
+  flatpak-kcm \
+  fprintd-pam \
+  gwenview \
+  icoutils \
+  kaccounts-integration-qt6 \
+  kaccounts-providers \
+  kate \
+  kcalc \
   kcm_systemd \
+  kde-gtk-config \
+  kde-partitionmanager \
+  kdegraphics-thumbnailers \
+  kf6-kimageformats \
+  kinfocenter \
+  kio-admin \
+  kio-gdrive \
+  kmenuedit \
+  konsole \
+  kscreen \
+  ksshaskpass \
   kwalletmanager5 \
+  kwin \
+  libappindicator-gtk3 \
+  okular \
+  pam-kwallet \
+  plasma-browser-integration \
+  plasma-desktop \
   plasma-foreground-booster-dmemcg \
+  plasma-login-manager \
+  plasma-nm \
+  plasma-pa \
+  plasma-systemmonitor \
+  plasma-workspace \
+  plasma-workspace-wayland \
+  qt6-qtimageformats \
+  rakuos-software-qt \
   rakuos-welcome-qt \
-  rakuos-software-qt
+  samba-usershares \
+  scx-manager \
+  signon-kwallet-extension \
+  spectacle \
+  systemd-oomd-defaults
 
 ## Remove packages
 dnf5.real -y remove plasma-discover \
