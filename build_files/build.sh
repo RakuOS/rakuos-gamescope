@@ -56,7 +56,8 @@ dnf5.real -y install @fonts @hardware-support \
   scx-manager \
   signon-kwallet-extension \
   spectacle \
-  systemd-oomd-defaults
+  systemd-oomd-defaults \
+  udisks2
 
 ## Remove packages
 dnf5.real -y remove plasma-discover \
