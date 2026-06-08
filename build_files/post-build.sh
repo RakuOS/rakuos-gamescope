@@ -9,5 +9,6 @@ set -ouex pipefail
 # policy so policy and module store agree.
 if command -v semodule >/dev/null 2>&1; then
     rm -rf /var/lib/selinux/*/tmp /var/lib/selinux/*/active/modules/disabled 2>/dev/null || true
+    rm -rf /run/selinux-policy
     semodule -B -N 2>/dev/null || semodule -B 2>/dev/null || true   # -N: rebuild, don't reload
 fi
