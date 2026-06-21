@@ -252,7 +252,7 @@ trigger-on-nvidia-build-fail:
   image: quay.io/buildah/stable:latest
   tags:
     - saas-linux-2xlarge-amd64
-  timeout: 30 minutes
+  timeout: 3 hours
   variables:
     STORAGE_DRIVER: overlay
     BUILDAH_FORMAT: oci
