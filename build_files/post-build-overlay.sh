@@ -199,7 +199,6 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   ksshaskpass
   qt6-qtimageformats
   rakuos-software-qt
-  scx-manager
 EOF
 
 echo "Generating base file manifest..."

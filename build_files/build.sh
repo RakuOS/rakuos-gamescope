@@ -52,7 +52,6 @@ dnf5.real -y install akonadi-server \
   rakuos-software-qt \
   rakuos-welcome-qt \
   samba-usershares \
-  scx-manager \
   signon-kwallet-extension \
   spectacle \
   systemd-oomd-defaults \
