@@ -206,7 +206,7 @@ EOF
 # treating them as orphans once selinux-policy (which pulled rpm-plugin-selinux)
 # is gone. mark install only flips reason=dependency -> reason=user in the
 # local db; it does not install/reinstall anything.
-rm /etc/dnf/protected.d/selinux-policy-targeted.conf
+
 dnf5.real -y remove selinux-policy\* selinux-policy-targeted selinux-policy-devel policycoreutils-gui
 dnf5.real -y install libselinux
 echo "Generating base file manifest..."
