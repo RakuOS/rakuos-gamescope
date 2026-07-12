@@ -209,6 +209,15 @@ EOF
 
 dnf5.real -y remove selinux-policy\* selinux-policy-targeted selinux-policy-devel policycoreutils-gui
 dnf5.real -y install libselinux
+
+# selinux-policy is fully removed on RakuOS (AppArmor is the sole MAC), but the
+# baked-in rpm-ostree treefile still defaults "selinux": true. rpm-ostree reads
+# that flag on every deploy-time layering operation and tries to load a policy
+# from / that no longer exists, causing spurious sepolicy-mismatch failures.
+if [ -f /usr/share/rpm-ostree/treefile.json ]; then
+    sed -i 's/"selinux": *true/"selinux": false/' /usr/share/rpm-ostree/treefile.json
+fi
+
 echo "Generating base file manifest..."
 /usr/libexec/rakuos/generate-base-manifest
 
