@@ -5,7 +5,6 @@ FEDORA_VERSION=$(rpm -E %fedora)
 
 ## Install packages
 dnf5.real -y install akonadi-server \
-  akonadi-server-mysql \
   ark \
   bluedevil \
   bluez \
