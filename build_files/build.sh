@@ -4,8 +4,7 @@ set -ouex pipefail
 FEDORA_VERSION=$(rpm -E %fedora)
 
 ## Install packages
-dnf5.real -y install akonadi-server \
-  ark \
+dnf5.real -y install ark \
   bluedevil \
   bluez \
   bluez-obexd \
