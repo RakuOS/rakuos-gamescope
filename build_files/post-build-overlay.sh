@@ -199,7 +199,6 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   ksshaskpass
   qt6-qtimageformats
   rakuos-software-qt
-  scx-manager
 EOF
 dnf5.real -y remove selinux-policy\* selinux-policy-targeted selinux-policy-devel policycoreutils-gui
 dnf5.real -y install libselinux
