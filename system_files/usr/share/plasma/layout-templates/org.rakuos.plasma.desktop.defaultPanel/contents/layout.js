@@ -16,7 +16,7 @@ if (panel.formFactor === "horizontal") {
 
 var kickoff = panel.addWidget("org.kde.plasma.kickoff");
 kickoff.currentConfigGroup = ["General"];
-kickoff.writeConfig("icon", "/usr/share/pixmaps/rakuos-logo.png");
+kickoff.writeConfig("icon", "/usr/share/pixmaps/rakuos-logo-outline.svg");
 
 panel.addWidget("org.kde.plasma.pager");
 panel.addWidget("org.kde.plasma.icontasks");
