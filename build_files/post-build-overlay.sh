@@ -198,6 +198,7 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   kf6-kimageformats
   ksshaskpass
   qt6-qtimageformats
+  rakuos-release-kde
   rakuos-software-qt
 EOF
 # Protect the akmods/rpm-build chain from getting autoremoved as "unused

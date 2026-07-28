@@ -49,6 +49,7 @@ dnf5.real -y install akonadi-server \
   plasma-workspace \
   plasma-workspace-wayland \
   qt6-qtimageformats \
+  rakuos-release-kde \
   rakuos-software-qt \
   rakuos-welcome-qt \
   samba-usershares \
