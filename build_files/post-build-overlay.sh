@@ -198,8 +198,16 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   kf6-kimageformats
   ksshaskpass
   qt6-qtimageformats
+  rakuos-release-kde
   rakuos-software-qt
 EOF
+# Protect the akmods/rpm-build chain from getting autoremoved as "unused
+# deps" of selinux-policy — the chain itself (akmod-wl -> akmods -> rpm-build)
+# has no real selinux Requires, it's just dnf's install-reason bookkeeping
+# treating them as orphans once selinux-policy (which pulled rpm-plugin-selinux)
+# is gone. mark install only flips reason=dependency -> reason=user in the
+# local db; it does not install/reinstall anything.
+
 dnf5.real -y remove selinux-policy\* selinux-policy-targeted selinux-policy-devel policycoreutils-gui
 dnf5.real -y install libselinux
 

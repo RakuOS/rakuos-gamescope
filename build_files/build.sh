@@ -47,6 +47,7 @@ dnf5.real -y install ark \
   plasma-workspace \
   plasma-workspace-wayland \
   qt6-qtimageformats \
+  rakuos-release-kde \
   rakuos-software-qt \
   rakuos-welcome-qt \
   samba-usershares \
