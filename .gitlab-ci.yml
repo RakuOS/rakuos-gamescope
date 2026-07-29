@@ -1450,6 +1450,14 @@ notify-discord:
       optional: true
     - job: sign-image-nvidia
       optional: true
+    - job: sign-image-standard-v4
+      optional: true
+    - job: sign-image-standard-v3
+      optional: true
+    - job: sign-image-nvidia-v4
+      optional: true
+    - job: sign-image-nvidia-v3
+      optional: true
   script:
     - |
       set -euo pipefail
