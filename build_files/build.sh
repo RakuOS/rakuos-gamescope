@@ -3,8 +3,18 @@
 set -ouex pipefail
 FEDORA_VERSION=$(rpm -E %fedora)
 
+# On the staging branch (RAKUOS_STAGING=1, set via --build-arg from CI)
+# install the staging os-release identity instead of the stable one, so
+# staging images identify themselves as "RakuOS KDE Staging".
+RAKUOS_RELEASE_PKG="rakuos-release-kde"
+if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
+    RAKUOS_RELEASE_PKG="rakuos-release-kde-staging"
+fi
+
 ## Install packages
-dnf5.real -y install ark \
+dnf5.real -y install akonadi-server \
+  akonadi-server-mysql \
+  ark \
   bluedevil \
   bluez \
   bluez-obexd \
@@ -47,7 +57,7 @@ dnf5.real -y install ark \
   plasma-workspace \
   plasma-workspace-wayland \
   qt6-qtimageformats \
-  rakuos-release-kde \
+  ${RAKUOS_RELEASE_PKG} \
   rakuos-software-qt \
   rakuos-welcome-qt \
   samba-usershares \
