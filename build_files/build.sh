@@ -34,6 +34,7 @@ dnf5.real -y install akonadi-server \
   kde-gtk-config \
   kde-partitionmanager \
   kdegraphics-thumbnailers \
+  kdotool \
   kf6-kimageformats \
   kinfocenter \
   kio-admin \
