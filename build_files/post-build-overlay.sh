@@ -176,8 +176,8 @@ EOF
 # is gone. mark install only flips reason=dependency -> reason=user in the
 # local db; it does not install/reinstall anything.
 
-dnf5.real -y remove selinux-policy\* selinux-policy-targeted selinux-policy-devel policycoreutils-gui
-dnf5.real -y install libselinux
+rum remove -y $(rpm -qa --qf '%{NAME}\n' 'selinux-policy*' 'policycoreutils-gui')
+rum install -y libselinux
 
 # selinux-policy is fully removed on RakuOS (AppArmor is the sole MAC), but the
 # baked-in rpm-ostree treefile still defaults "selinux": true. rpm-ostree reads

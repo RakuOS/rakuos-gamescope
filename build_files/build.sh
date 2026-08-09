@@ -12,7 +12,7 @@ if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
 fi
 
 ## Install packages
-dnf5.real -y install akonadi-server \
+rum install -y akonadi-server \
   akonadi-server-mysql \
   ark \
   bluedevil \
@@ -68,7 +68,7 @@ dnf5.real -y install akonadi-server \
   udisks2
 
 ## Remove packages
-dnf5.real -y remove plasma-discover \
+rum remove -y plasma-discover \
   plasma-discover-offline-updates \
   plasma-discover-packagekit \
   plasma-welcome \
