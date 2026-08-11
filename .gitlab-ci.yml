@@ -523,7 +523,7 @@ test-image-standard:
 
       echo "=== RPM DB stress test: Justfile + Anaconda packages ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        dnf5.real install -y --allowerasing \
+        rum install -y --allowerasing \
           --enable-repo=fedora-cisco-openh264 \
           dracut-live livesys-scripts fuse-overlayfs \
           anaconda-live libblockdev-btrfs libblockdev-lvm libblockdev-dm \
@@ -531,7 +531,7 @@ test-image-standard:
 
       echo "=== RPM DB stress test: packages-live.list ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs dnf5.real install -y'
+        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs rum install -y'
 
       buildah rm "${CTR}" || true
       echo "RPM DB stress test passed."
@@ -552,7 +552,7 @@ test-image-nvidia:
 
       echo "=== RPM DB stress test: Justfile + Anaconda packages ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        dnf5.real install -y --allowerasing \
+        rum install -y --allowerasing \
           --enable-repo=fedora-cisco-openh264 \
           dracut-live livesys-scripts fuse-overlayfs \
           anaconda-live libblockdev-btrfs libblockdev-lvm libblockdev-dm \
@@ -560,11 +560,11 @@ test-image-nvidia:
 
       echo "=== RPM DB stress test: packages-live.list ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs dnf5.real install -y'
+        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs rum install -y'
 
       echo "=== RPM DB stress test: NVIDIA packages ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        bash -c 'for pkg in nvidia-gpu-firmware mesa-vulkan-drivers; do dnf5.real -yq reinstall --allowerasing "$pkg" || dnf5.real -yq install --allowerasing "$pkg"; done'
+        bash -c 'for pkg in nvidia-gpu-firmware mesa-vulkan-drivers; do rum reinstall -y --allowerasing "$pkg" || rum install -y --allowerasing "$pkg"; done'
 
       buildah rm "${CTR}" || true
       echo "RPM DB stress test (NVIDIA) passed."
@@ -585,7 +585,7 @@ test-image-standard-v4:
 
       echo "=== RPM DB stress test: Justfile + Anaconda packages ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        dnf5.real install -y --allowerasing \
+        rum install -y --allowerasing \
           --enable-repo=fedora-cisco-openh264 \
           dracut-live livesys-scripts fuse-overlayfs \
           anaconda-live libblockdev-btrfs libblockdev-lvm libblockdev-dm \
@@ -593,7 +593,7 @@ test-image-standard-v4:
 
       echo "=== RPM DB stress test: packages-live.list ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs dnf5.real install -y'
+        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs rum install -y'
 
       buildah rm "${CTR}" || true
       echo "RPM DB stress test passed."
@@ -614,7 +614,7 @@ test-image-standard-v3:
 
       echo "=== RPM DB stress test: Justfile + Anaconda packages ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        dnf5.real install -y --allowerasing \
+        rum install -y --allowerasing \
           --enable-repo=fedora-cisco-openh264 \
           dracut-live livesys-scripts fuse-overlayfs \
           anaconda-live libblockdev-btrfs libblockdev-lvm libblockdev-dm \
@@ -622,7 +622,7 @@ test-image-standard-v3:
 
       echo "=== RPM DB stress test: packages-live.list ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs dnf5.real install -y'
+        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs rum install -y'
 
       buildah rm "${CTR}" || true
       echo "RPM DB stress test passed."
@@ -643,7 +643,7 @@ test-image-nvidia-v4:
 
       echo "=== RPM DB stress test: Justfile + Anaconda packages ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        dnf5.real install -y --allowerasing \
+        rum install -y --allowerasing \
           --enable-repo=fedora-cisco-openh264 \
           dracut-live livesys-scripts fuse-overlayfs \
           anaconda-live libblockdev-btrfs libblockdev-lvm libblockdev-dm \
@@ -651,11 +651,11 @@ test-image-nvidia-v4:
 
       echo "=== RPM DB stress test: packages-live.list ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs dnf5.real install -y'
+        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs rum install -y'
 
       echo "=== RPM DB stress test: NVIDIA packages ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        bash -c 'for pkg in nvidia-gpu-firmware mesa-vulkan-drivers; do dnf5.real -yq reinstall --allowerasing "$pkg" || dnf5.real -yq install --allowerasing "$pkg"; done'
+        bash -c 'for pkg in nvidia-gpu-firmware mesa-vulkan-drivers; do rum reinstall -y --allowerasing "$pkg" || rum install -y --allowerasing "$pkg"; done'
 
       buildah rm "${CTR}" || true
       echo "RPM DB stress test (NVIDIA) passed."
@@ -676,7 +676,7 @@ test-image-nvidia-v3:
 
       echo "=== RPM DB stress test: Justfile + Anaconda packages ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        dnf5.real install -y --allowerasing \
+        rum install -y --allowerasing \
           --enable-repo=fedora-cisco-openh264 \
           dracut-live livesys-scripts fuse-overlayfs \
           anaconda-live libblockdev-btrfs libblockdev-lvm libblockdev-dm \
@@ -684,11 +684,11 @@ test-image-nvidia-v3:
 
       echo "=== RPM DB stress test: packages-live.list ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs dnf5.real install -y'
+        bash -c 'grep -v "^\s*#" /usr/share/rakuos/packages-live.list | grep -v "^\s*$" | sed "s/\s*#.*//" | tr -s " \t" "\n" | grep -v "^$" | xargs rum install -y'
 
       echo "=== RPM DB stress test: NVIDIA packages ==="
       buildah run --isolation chroot --network host "${CTR}" -- \
-        bash -c 'for pkg in nvidia-gpu-firmware mesa-vulkan-drivers; do dnf5.real -yq reinstall --allowerasing "$pkg" || dnf5.real -yq install --allowerasing "$pkg"; done'
+        bash -c 'for pkg in nvidia-gpu-firmware mesa-vulkan-drivers; do rum reinstall -y --allowerasing "$pkg" || rum install -y --allowerasing "$pkg"; done'
 
       buildah rm "${CTR}" || true
       echo "RPM DB stress test (NVIDIA) passed."
