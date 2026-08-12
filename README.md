@@ -1,3 +1,3 @@
 # rakuos-gamescope
 
-This repo holds and builds the kde RakuOS Atomic cloud native images
+This repo holds and builds the gamescope (deck) RakuOS Atomic cloud native images
