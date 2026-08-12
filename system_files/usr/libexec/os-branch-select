@@ -13,7 +13,7 @@ if [[ $# -eq 1 ]]; then
           echo rel
           exit 0
           ;;
-        staging)
+        testing)
           echo rc
           exit 0
           ;;
@@ -29,7 +29,7 @@ if [[ $# -eq 1 ]]; then
     -l)
       echo rel
       echo rc
-      echo staging
+      echo testing
       echo bc
       echo main
       exit 0
@@ -39,7 +39,7 @@ if [[ $# -eq 1 ]]; then
         /usr/bin/bootc rebase quay.io/rakuos/rakuos-gamescope:latest
       exit 0
       ;;
-    rc|staging)
+    rc|testing)
       runcon system_u:unconfined_r:unconfined_t:s0 \
         /usr/bin/bootc rebase quay.io/rakuos/rakuos-gamescope:staging
       exit 0
@@ -47,4 +47,4 @@ if [[ $# -eq 1 ]]; then
   esac
 fi
 
-echo "Usage: steamos-select-branch <stable|staging|>" 1>&2
+echo "Usage: steamos-select-branch <stable|testing|>" 1>&2
