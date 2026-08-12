@@ -51,7 +51,7 @@ rum install -y akonadi-server \
   plasma-browser-integration \
   plasma-desktop \
   plasma-foreground-booster-dmemcg \
-  plasma-login-manager \
+  sddm \
   plasma-nm \
   plasma-pa \
   plasma-systemmonitor \
@@ -65,7 +65,11 @@ rum install -y akonadi-server \
   signon-kwallet-extension \
   spectacle \
   systemd-oomd-defaults \
-  udisks2
+  udisks2 \
+  steam \
+  gamescope \
+  gamescope-session \
+  gamescope-session-steam
 
 ## Remove packages
 rum remove -y plasma-discover \
@@ -88,4 +92,5 @@ rm /usr/share/applications/org.kde.foreground-booster.desktop
 sed -i '$r /usr/share/plasma/shells/org.kde.plasma.desktop/contents/updates/rakuos-pins.js' /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js
 
 ## Enable Services
-systemctl enable plasmalogin.service
+systemctl enable sddm.service
+systemctl enable autologin-setup.service

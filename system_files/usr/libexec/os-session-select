@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+
+sudo /usr/bin/rakuos-session-select plasma
+steam -shutdown

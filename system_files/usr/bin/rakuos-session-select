@@ -1,0 +1,13 @@
+#!/bin/bash
+SESSION="$1"
+
+case "$SESSION" in
+    "plasma")
+        sed -i 's/Session=.*/Session=plasma.desktop/' /etc/sddm.conf.d/autologin.conf
+        systemctl restart sddm
+        ;;
+    "steam")
+        sed -i 's/Session=.*/Session=gamescope-session-steam.desktop/' /etc/sddm.conf.d/autologin.conf
+        systemctl restart sddm
+        ;;
+esac
