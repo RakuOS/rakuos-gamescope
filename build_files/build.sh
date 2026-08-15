@@ -73,11 +73,7 @@ rum install -y --allowerasing akonadi-server \
   steam-devices \
   gamescope \
   gamescope-session \
-  gamescope-session-steam \
-  steamos-manager \
-  steamos-manager-powerstation
-
-rum install -y steamos-manager-powerstation-gamescope-session-plus steamos-manager-gamescope-session-plus
+  gamescope-session-steam
 
 ## Remove packages
 rum remove -y plasma-discover \
@@ -98,9 +94,6 @@ rm -rf /usr/share/wallpapers/F44
 #KDE customizations
 rm /usr/share/applications/org.kde.foreground-booster.desktop
 sed -i '$r /usr/share/plasma/shells/org.kde.plasma.desktop/contents/updates/rakuos-pins.js' /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js
-
-## Fix steamosctl
-sed -i 's|Exec=/bin/false|Exec=/usr/lib/steamos-manager|g' /usr/share/dbus-1/system-services/com.steampowered.SteamOSManager1.service
 
 ## Enable Services
 systemctl enable sddm.service
