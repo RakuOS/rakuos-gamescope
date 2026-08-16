@@ -1,23 +1,15 @@
 #!/bin/bash
+
 SESSION="$1"
 
 case "$SESSION" in
     "plasma-now")
-    	# TODO: implement shutdown for plasma
-        sed -i 's/Session=.*/Session=plasma.desktop/' /etc/plasmalogin.conf.d/autologin.conf
-        systemctl restart plasmalogin
+        sudo /usr/libexec/os-session-switch plasma
+        steam -shutdown
+        systemctl --user stop gamescope-session.target
         ;;
     "steam-now")
-    	steam -shutdown
-        sed -i 's/Session=.*/Session=gamescope-session-steam.desktop/' /etc/plasmalogin.conf.d/autologin.conf
-        systemctl restart plasmalogin
-        ;;
-    "plasma")
-        sed -i 's/Session=.*/Session=plasma.desktop/' /etc/plasmalogin.conf.d/autologin.conf
-        echo "Plasma session set as default session"
-        ;;
-    "steam")
-        sed -i 's/Session=.*/Session=gamescope-session-steam.desktop/' /etc/plasmalogin.conf.d/autologin.conf
-        echo "Steam big picture set as default session"
+        sudo /usr/libexec/os-session-switch steam
+        qdbus-qt6 org.kde.Shutdown /Shutdown org.kde.Shutdown.logout
         ;;
 esac

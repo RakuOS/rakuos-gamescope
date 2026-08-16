@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Return to Gaming Mode
-Exec=run0 systemd-run rakuos-session-select gamescope-now
+Exec=rakuos-session-select steam-now
 Icon=steam
 Terminal=false
 Type=Application

@@ -1,1 +1,1 @@
-ALL ALL=(ALL) NOPASSWD: /usr/bin/rakuos-session-select
+ALL ALL=(ALL) NOPASSWD: /usr/libexec/os-session-switch
