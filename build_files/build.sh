@@ -52,7 +52,7 @@ rum install -y --allowerasing akonadi-server \
   plasma-browser-integration \
   plasma-desktop \
   plasma-foreground-booster-dmemcg \
-  sddm \
+  plasma-login-manager \
   plasma-nm \
   plasma-pa \
   plasma-systemmonitor \
@@ -96,9 +96,6 @@ rm /usr/share/applications/org.kde.foreground-booster.desktop
 sed -i '$r /usr/share/plasma/shells/org.kde.plasma.desktop/contents/updates/rakuos-pins.js' /usr/share/plasma/layout-templates/org.kde.plasma.desktop.defaultPanel/contents/layout.js
 
 ## Enable Services
-systemctl enable sddm.service
+systemctl enable plasmalogin.service
 systemctl enable inputplumber.service
 systemctl enable autologin-setup.service
-systemctl enable steamos-manager.service
-systemctl enable --global steamos-manager-session-cleanup.service
-systemctl enable --global steamos-manager.service
