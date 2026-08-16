@@ -123,7 +123,7 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   akonadi-server
   akonadi-server-mysql
   kscreen
-  sddm
+  plasma-login-manager
   kio-admin
   fprintd-pam
   flatpak-kcm
@@ -172,10 +172,6 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   inputplumber
   gamescope-session
   gamescope-session-steam
-  steamos-manager
-  steamos-manager-gamescope-session-plus
-  steamos-manager-powerstation
-  steamos-manager-powerstation-gamescope-session-plus
 EOF
 # Protect the akmods/rpm-build chain from getting autoremoved as "unused
 # deps" of selinux-policy — the chain itself (akmod-wl -> akmods -> rpm-build)

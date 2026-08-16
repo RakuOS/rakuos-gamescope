@@ -82,6 +82,8 @@ rum remove -y plasma-discover \
   plasma-welcome \
   plasma-welcome-fedora
 
+rum remove -y cardwire
+
 ## Remove Fedora Look and Feel
 rm -rf /usr/share/plasma/look-and-feel/org.fedoraproject.fedora.desktop
 rm -rf /usr/share/plasma/look-and-feel/org.fedoraproject.fedoradark.desktop

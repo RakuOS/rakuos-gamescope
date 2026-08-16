@@ -5,12 +5,12 @@ case "$SESSION" in
     "plasma-now")
     	# TODO: implement shutdown for plasma
         sed -i 's/Session=.*/Session=plasma.desktop/' /etc/plasmalogin.conf.d/autologin.conf
-        systemctl restart sddm
+        systemctl restart plasmalogin
         ;;
     "steam-now")
     	steam -shutdown
         sed -i 's/Session=.*/Session=gamescope-session-steam.desktop/' /etc/plasmalogin.conf.d/autologin.conf
-        systemctl restart sddm
+        systemctl restart plasmalogin
         ;;
     "plasma")
         sed -i 's/Session=.*/Session=plasma.desktop/' /etc/plasmalogin.conf.d/autologin.conf
