@@ -170,6 +170,7 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   rakuos-software-qt
   steam
   inputplumber
+  powerbuttond
   gamescope-session
   gamescope-session-steam
 EOF

@@ -71,6 +71,7 @@ rum install -y --allowerasing akonadi-server \
   inputplumber \
   wireplumber \
   steam-devices \
+  powerbuttond \
   gamescope \
   gamescope-session \
   gamescope-session-steam
@@ -101,3 +102,4 @@ sed -i '$r /usr/share/plasma/shells/org.kde.plasma.desktop/contents/updates/raku
 systemctl enable plasmalogin.service
 systemctl enable inputplumber.service
 systemctl enable autologin-setup.service
+systemctl --global enable steamos-powerbuttond.service
