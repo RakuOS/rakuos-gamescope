@@ -12,6 +12,7 @@ fi
 mkdir -p "$CONF_DIR"
 cat <<EOF > "$CONF_FILE"
 [Autologin]
+Relogin=true
 User=$TARGET_USER
 Session=gamescope-session-steam.desktop
 EOF

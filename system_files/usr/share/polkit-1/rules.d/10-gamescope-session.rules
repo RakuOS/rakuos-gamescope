@@ -1,5 +1,7 @@
 polkit.addRule(function(action, subject) {
-    if ((action.id == "org.rakuos.policykit.gamescope-session.pkexec.os-biosupdat" ||
+    if ((action.id == "org.rakuos.policykit.rakuos.pkexec.switch-sessions" ||
+         action.id == "org.rakuos.policykit.rakuos.pkexec.restart-login" ||
+         action.id == "org.rakuos.policykit.gamescope-session.pkexec.os-biosupdat" ||
          action.id == "org.rakuos.policykit.gamescope-session.pkexec.os-branch-select" ||
          action.id == "org.rakuos.policykit.gamescope-session.pkexec.os-session-select" ||
          action.id == "org.rakuos.policykit.gamescope-session.pkexec.os-update") &&

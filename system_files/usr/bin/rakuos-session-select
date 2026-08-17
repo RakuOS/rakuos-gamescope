@@ -4,12 +4,14 @@ SESSION="$1"
 
 case "$SESSION" in
     "plasma-now")
-        sudo /usr/libexec/os-session-switch plasma
+        pkexec /usr/libexec/os-session-switch plasma
         steam -shutdown
         systemctl --user stop gamescope-session.target
+        pkexec /usr/libexec/os-restart-login
         ;;
     "steam-now")
-        sudo /usr/libexec/os-session-switch steam
+        pkexec /usr/libexec/os-session-switch steam
         qdbus-qt6 org.kde.Shutdown /Shutdown org.kde.Shutdown.logout
+        pkexec /usr/libexec/os-restart-login
         ;;
 esac
