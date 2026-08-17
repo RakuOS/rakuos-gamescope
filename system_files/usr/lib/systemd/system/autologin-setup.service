@@ -4,7 +4,7 @@ Before=sddm.service display-manager.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/autologin.sh
+ExecStart=/usr/libexec/autologin.sh gamescope-session-steam
 
 [Install]
-WantedBy=multi-user.target sddm.service
+WantedBy=multi-user.target plasmalogin.service

@@ -102,4 +102,5 @@ sed -i '$r /usr/share/plasma/shells/org.kde.plasma.desktop/contents/updates/raku
 systemctl enable plasmalogin.service
 systemctl enable inputplumber.service
 systemctl enable autologin-setup.service
+systemctl mask autologin-setup-plasma.service
 systemctl --global enable steamos-powerbuttond.service

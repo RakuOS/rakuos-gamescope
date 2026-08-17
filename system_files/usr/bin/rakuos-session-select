@@ -3,15 +3,27 @@
 SESSION="$1"
 
 case "$SESSION" in
-    "plasma-now")
+    "steam"|"steam-now")
+        pkexec /usr/libexec/os-session-switch steam
+        qdbus-qt6 org.kde.Shutdown /Shutdown org.kde.Shutdown.logout
+        pkexec /usr/libexec/os-restart-login
+        ;;
+    "plasma"|"plasma-now")
         pkexec /usr/libexec/os-session-switch plasma
         steam -shutdown
         systemctl --user stop gamescope-session.target
         pkexec /usr/libexec/os-restart-login
         ;;
-    "steam-now")
-        pkexec /usr/libexec/os-session-switch steam
-        qdbus-qt6 org.kde.Shutdown /Shutdown org.kde.Shutdown.logout
-        pkexec /usr/libexec/os-restart-login
+    "steam-persistent")
+        sudo systemctl mask autologin-setup-plasma.service
+        sudo systemctl unmask autologin-setup.service
+        sudo systemctl enable --now autologin-setup.service
+        echo "Steam Big Picture is persistent session now"
+        ;;
+    "plasma-persistent")
+        sudo systemctl mask autologin-setup.service
+        sudo systemctl unmask autologin-setup-plasma.service
+        sudo systemctl enable --now autologin-setup-plasma.service
+        echo "Plasma is persistent session now"
         ;;
 esac

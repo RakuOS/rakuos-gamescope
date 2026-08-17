@@ -1,0 +1,10 @@
+[Unit]
+Description=Configure autologin
+Before=sddm.service display-manager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/autologin.sh plasma
+
+[Install]
+WantedBy=multi-user.target plasmalogin.service
