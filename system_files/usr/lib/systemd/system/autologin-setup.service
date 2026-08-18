@@ -7,4 +7,4 @@ Type=oneshot
 ExecStart=/usr/libexec/autologin.sh gamescope-session-steam
 
 [Install]
-WantedBy=multi-user.target plasmalogin.service
+WantedBy=multi-user.target
