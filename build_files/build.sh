@@ -6,9 +6,9 @@ FEDORA_VERSION=$(rpm -E %fedora)
 # On the staging branch (RAKUOS_STAGING=1, set via --build-arg from CI)
 # install the staging os-release identity instead of the stable one, so
 # staging images identify themselves as "RakuOS KDE Staging".
-RAKUOS_RELEASE_PKG="rakuos-release-kde"
+RAKUOS_RELEASE_PKG="rakuos-release-gamescope"
 if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
-    RAKUOS_RELEASE_PKG="rakuos-release-kde-staging"
+    RAKUOS_RELEASE_PKG="rakuos-release-gamescope-staging"
 fi
 
 ## Install packages
