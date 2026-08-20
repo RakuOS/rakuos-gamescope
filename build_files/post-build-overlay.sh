@@ -116,61 +116,12 @@ echo "Appending KDE protected packages to protected-packages.txt..."
 cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
 
 # KDE DE packages (from rakuos-kde/build_files/build.sh)
-  plasma-desktop
-  plasma-workspace
-  plasma-workspace-wayland
-  plasma-browser-integration
-  akonadi-server
-  akonadi-server-mysql
-  kscreen
-  plasma-login-manager
-  kio-admin
-  fprintd-pam
-  flatpak-kcm
-  kio-gdrive
-  kaccounts-integration-qt6
-  kaccounts-providers
-  kwin
-  kmenuedit
-  kinfocenter
-  plasma-nm
-  plasma-pa
-  kdegraphics-thumbnailers
-  breeze-icon-theme
-  breeze-gtk
-  bluedevil
-  bluez
-  bluez-obexd
-  bluez-cups
-  kde-gtk-config
-  kcm_systemd
-  kwalletmanager5
-  pam-kwallet
-  signon-kwallet-extension
-  systemd-oomd-defaults
-  samba-usershares
-  libappindicator-gtk3
-  plasma-foreground-booster-dmemcg
-  rakuos-welcome-qt
-  ark
-  dolphin
-  gwenview
-  okular
-  kate
-  kde-partitionmanager
-  plasma-systemmonitor
-  konsole
-  kcalc
-  spectacle
-  icoutils
-  kf6-kimageformats
-  ksshaskpass
-  qt6-qtimageformats
-  rakuos-release-kde
-  rakuos-software-qt
   steam
   inputplumber
+  wireplumber
+  steam-devices
   powerbuttond
+  gamescope
   gamescope-session
   gamescope-session-steam
 EOF

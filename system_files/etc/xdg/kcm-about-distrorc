@@ -1,8 +1,0 @@
-[General]
-LogoPath=rakuos-logo
-Name=RakuOS Linux
-Version=44
-Variant=KDE Plasma Atomic Desktop
-Website=https://rakuos.org
-BugReportUrl=https://github.com/RakuOS
-SupportUrl=https://rakuos.org/forum
