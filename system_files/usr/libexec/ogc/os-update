@@ -22,7 +22,7 @@
 check_for_update() {
     timeout 1 bash -c 'cat < /dev/null > /dev/tcp/1.1.1.1/53' 2>/dev/null || exit 2
 
-    if bootc upgrade --check 2>&1 | grep -q "No changes in:"; then
+    if bootc upgrade --check 2>&1 | grep "No changes in:"; then
         exit 7
     else
         echo "Update available: unknown-version"
