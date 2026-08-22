@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+
+/usr/bin/rakuos-session-select plasma-now

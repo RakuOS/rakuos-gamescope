@@ -1,0 +1,50 @@
+#!/usr/bin/bash
+
+set -e
+
+source /etc/os-release
+
+if [[ $# -eq 1 ]]; then
+  case "$1" in
+    -c)
+      branch=$(bootc status --json --booted | jq -r '.status.booted.image.image.image | split(":")[-1]')
+      case $branch in
+        latest|stable)
+          echo rel
+          exit 0
+          ;;
+        staging)
+          echo rc
+          exit 0
+          ;;
+        *)
+          # This can happen on CI builds or when downgrading from a newer build that knows of more branches.  The update
+          # path should decide how to handle it.
+          echo >&2 "Warning: Unrecognized currently selected branch name '$branch', updates may not succeed."
+          echo "$branch"
+          exit 0
+          ;;
+      esac
+      ;;
+    -l)
+      echo rel
+      echo rc
+      echo staging
+      echo bc
+      echo main
+      exit 0
+      ;;
+    rel|latest|stable)
+      runcon system_u:unconfined_r:unconfined_t:s0 \
+        /usr/bin/bootc rebase quay.io/rakuos/rakuos-gamescope:latest
+      exit 0
+      ;;
+    rc|staging)
+      runcon system_u:unconfined_r:unconfined_t:s0 \
+        /usr/bin/bootc rebase quay.io/rakuos/rakuos-gamescope:staging
+      exit 0
+      ;;
+  esac
+fi
+
+echo "Usage: steamos-select-branch <stable|testing|>" 1>&2

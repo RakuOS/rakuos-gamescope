@@ -1,0 +1,58 @@
+#!/usr/bin/bash
+
+# The Steam client is known to call this script with the following parameter combinations:
+# steamos-update --supports-duplicate-detection     -- should do nothing
+# steamos-update --enable-duplicate-detection check -- should check for update
+# steamos-update check                              -- should check for update
+# steamos-update --enable-duplicate-detection       -- should perform an update
+# steamos-update                                    -- should perform an update
+#
+# For check:
+# - If there is no update available, exit with code 7
+# - If there is an update available, print "Update available: <VERSION>" and exit with code 0
+#   Steam displays "<VERSION>" when developer mode is enabled
+# - If there is an error, exit with a non-zero code other than 7
+#
+# For update:
+# - Begin the OS update process and continuously output the percentage completion as
+#   an integer value between 0-100 followed by a '%' character and newline
+# - If the update completes successfully, exit with code 0
+# - If there is an error, exit with a non-zero code other than 7
+
+check_for_update() {
+    timeout 1 bash -c 'cat < /dev/null > /dev/tcp/1.1.1.1/53' 2>/dev/null || exit 2
+
+    if bootc upgrade --check 2>&1 | grep "No changes in:"; then
+        exit 7
+    else
+        echo "Update available: unknown-version"
+        exit 0
+    fi
+}
+
+run_update() {
+    echo "0%"
+    echo "1%"
+    bootc upgrade 2>&1
+    BOOTC_STATUS=${PIPESTATUS[0]}
+
+    if [ "$BOOTC_STATUS" -eq 0 ]; then
+      echo "100%"
+      exit 0
+    else
+      if [ "$BOOTC_STATUS" -eq 7 ]; then
+        exit 2
+      fi
+
+      exit "$BOOTC_STATUS"
+    fi
+}
+
+COMMAND="$1"
+
+case "$COMMAND" in
+    check) check_for_update ;;
+    update) run_update ;;
+esac
+
+exit 7

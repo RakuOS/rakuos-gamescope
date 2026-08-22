@@ -1,7 +1,7 @@
 This repo builds the RakuOS KDE image.
 
 Scope:
-- KDE packages
+- KDE, gamescope, deck and controller packages
 - core apps
 - Default settings
 - ISO configuration
