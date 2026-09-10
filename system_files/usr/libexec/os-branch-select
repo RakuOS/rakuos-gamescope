@@ -30,8 +30,8 @@ if [[ $# -eq 1 ]]; then
       echo rel
       echo rc
       echo staging
-      echo bc
-      echo main
+      echo stable
+      echo latest
       exit 0
       ;;
     rel|latest|stable)
