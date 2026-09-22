@@ -67,6 +67,7 @@ stages:
       echo "RAKUOS_STAGING=${RAKUOS_STAGING}"
       echo "Pulling base image tag: ${BASE_IMAGE_TAG}"
     - export DATE_TAG="$(date -u +%Y%m%d)"
+    - dnf install -y --quiet jq
   variables:
     STORAGE_DRIVER: overlay
     BUILDAH_FORMAT: oci
@@ -87,6 +88,27 @@ build-base:
     - export TEMP_TAG="${IMAGE_REGISTRY_QUAY}:ci-temp-${CI_PIPELINE_ID}"
 
     - |
+      # The MOK key lives in rakuos-base's Secure Files, not this project's —
+      # fetch it cross-project via the API using BASE_PROJECT_ID/GITLAB_API_TOKEN
+      # (same pair already used above for cross-project pipeline calls).
+      MOK_SECRET_FLAG=""
+      SECURE_FILE_ID=$(curl --silent \
+          --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+          "${CI_API_V4_URL}/projects/${BASE_PROJECT_ID}/secure_files" \
+          | jq -r '.[] | select(.name == "MOK.key") | .id' 2>/dev/null || true)
+      if [[ -n "${SECURE_FILE_ID}" ]] && [[ "${SECURE_FILE_ID}" != "null" ]]; then
+          curl --silent \
+              --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+              -o /tmp/MOK.key \
+              "${CI_API_V4_URL}/projects/${BASE_PROJECT_ID}/secure_files/${SECURE_FILE_ID}/download"
+          chmod 600 /tmp/MOK.key
+          MOK_SECRET_FLAG="--secret id=mok_key,src=/tmp/MOK.key"
+          echo "MOK.key downloaded from rakuos-base — modules will be signed"
+      else
+          echo "MOK.key not found in rakuos-base Secure Files — skipping module signing"
+      fi
+
+    - |
       buildah build \
         --file Containerfile \
         --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
@@ -94,6 +116,7 @@ build-base:
         --build-arg RAKUOS_ISA_LEVEL="v2" \
         --skip-unused-stages=false \
         -v "$(pwd)":/run/src --security-opt=label=disable \
+        ${MOK_SECRET_FLAG} \
         --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         --label "org.opencontainers.image.version=${BRANCH_SLUG}.${DATE_TAG}" \
         --label "org.opencontainers.image.description=${IMAGE_DESC}" \
@@ -213,6 +236,27 @@ build-base-v4:
     - export TEMP_TAG="${IMAGE_REGISTRY_QUAY_V4}:ci-temp-${CI_PIPELINE_ID}"
 
     - |
+      # The MOK key lives in rakuos-base's Secure Files, not this project's —
+      # fetch it cross-project via the API using BASE_PROJECT_ID/GITLAB_API_TOKEN
+      # (same pair already used above for cross-project pipeline calls).
+      MOK_SECRET_FLAG=""
+      SECURE_FILE_ID=$(curl --silent \
+          --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+          "${CI_API_V4_URL}/projects/${BASE_PROJECT_ID}/secure_files" \
+          | jq -r '.[] | select(.name == "MOK.key") | .id' 2>/dev/null || true)
+      if [[ -n "${SECURE_FILE_ID}" ]] && [[ "${SECURE_FILE_ID}" != "null" ]]; then
+          curl --silent \
+              --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+              -o /tmp/MOK.key \
+              "${CI_API_V4_URL}/projects/${BASE_PROJECT_ID}/secure_files/${SECURE_FILE_ID}/download"
+          chmod 600 /tmp/MOK.key
+          MOK_SECRET_FLAG="--secret id=mok_key,src=/tmp/MOK.key"
+          echo "MOK.key downloaded from rakuos-base — modules will be signed"
+      else
+          echo "MOK.key not found in rakuos-base Secure Files — skipping module signing"
+      fi
+
+    - |
       buildah build \
         --file Containerfile \
         --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
@@ -221,6 +265,7 @@ build-base-v4:
         --build-arg RAKUOS_ISA_LEVEL="v4" \
         --skip-unused-stages=false \
         -v "$(pwd)":/run/src --security-opt=label=disable \
+        ${MOK_SECRET_FLAG} \
         --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         --label "org.opencontainers.image.version=${BRANCH_SLUG}.${DATE_TAG}" \
         --label "org.opencontainers.image.description=${IMAGE_DESC}" \
@@ -264,6 +309,27 @@ build-base-v3:
     - export TEMP_TAG="${IMAGE_REGISTRY_QUAY_V3}:ci-temp-${CI_PIPELINE_ID}"
 
     - |
+      # The MOK key lives in rakuos-base's Secure Files, not this project's —
+      # fetch it cross-project via the API using BASE_PROJECT_ID/GITLAB_API_TOKEN
+      # (same pair already used above for cross-project pipeline calls).
+      MOK_SECRET_FLAG=""
+      SECURE_FILE_ID=$(curl --silent \
+          --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+          "${CI_API_V4_URL}/projects/${BASE_PROJECT_ID}/secure_files" \
+          | jq -r '.[] | select(.name == "MOK.key") | .id' 2>/dev/null || true)
+      if [[ -n "${SECURE_FILE_ID}" ]] && [[ "${SECURE_FILE_ID}" != "null" ]]; then
+          curl --silent \
+              --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+              -o /tmp/MOK.key \
+              "${CI_API_V4_URL}/projects/${BASE_PROJECT_ID}/secure_files/${SECURE_FILE_ID}/download"
+          chmod 600 /tmp/MOK.key
+          MOK_SECRET_FLAG="--secret id=mok_key,src=/tmp/MOK.key"
+          echo "MOK.key downloaded from rakuos-base — modules will be signed"
+      else
+          echo "MOK.key not found in rakuos-base Secure Files — skipping module signing"
+      fi
+
+    - |
       buildah build \
         --file Containerfile \
         --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
@@ -272,6 +338,7 @@ build-base-v3:
         --build-arg RAKUOS_ISA_LEVEL="v3" \
         --skip-unused-stages=false \
         -v "$(pwd)":/run/src --security-opt=label=disable \
+        ${MOK_SECRET_FLAG} \
         --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         --label "org.opencontainers.image.version=${BRANCH_SLUG}.${DATE_TAG}" \
         --label "org.opencontainers.image.description=${IMAGE_DESC}" \

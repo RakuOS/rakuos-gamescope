@@ -43,13 +43,9 @@ rum install -y \
     ${KERNEL_DECK_PKG}-devel \
     ${KERNEL_DECK_PKG}-devel-matched
 
-# Determine the installed kernel version and (re)build its initramfs, same
-# as rakuos-base does for its own kernel swaps.
-QUALIFIED_KERNEL=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' ${KERNEL_DECK_PKG})
-depmod "$QUALIFIED_KERNEL"
-/usr/bin/dracut --no-hostonly --kver "$QUALIFIED_KERNEL" --reproducible --zstd -v \
-    --add ostree --add fido2 --add rakuos-overlay -f "/usr/lib/modules/$QUALIFIED_KERNEL/initramfs.img"
-chmod 0600 /usr/lib/modules/"$QUALIFIED_KERNEL"/initramfs.img
+# depmod/dracut for the new kernel-deck happen in drivers.sh, after akmods
+# and MOK module/kernel signing so the initramfs is built from the final,
+# signed module set (same order rakuos-base uses for its own kernel).
 
 # Terra ships disabled by default (third-party repos are opt-in), so enable
 # it here in case any packages below come from Terra; post-build.sh disables
