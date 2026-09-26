@@ -65,7 +65,9 @@ rum install -y akonadi-server \
   gamescope-session \
   gamescope-session-steam \
   jupiter-fan-control \
-  jupiter-hw-support
+  jupiter-hw-support \
+  steamdeck-dsp \
+  steamdeck-firmware
 
 ## Remove packages
 rum remove -y cardwire
