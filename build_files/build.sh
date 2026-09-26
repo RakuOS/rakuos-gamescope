@@ -63,7 +63,9 @@ rum install -y akonadi-server \
   powerbuttond \
   gamescope \
   gamescope-session \
-  gamescope-session-steam
+  gamescope-session-steam \
+  jupiter-fan-control \
+  jupiter-hw-support
 
 ## Remove packages
 rum remove -y cardwire
