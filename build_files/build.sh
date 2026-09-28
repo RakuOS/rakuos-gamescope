@@ -74,6 +74,10 @@ rum remove -y cardwire
 
 ## Enable Services
 systemctl enable inputplumber.service
+# steamdeck-dsp: copy the Deck's pipewire/wireplumber hardware profiles
+# (speaker DSP filter chain, mic, default-device rules) into /etc at boot
+systemctl enable pipewire-sysconf.service
+systemctl enable wireplumber-sysconf.service
 systemctl enable autologin-setup.service
 systemctl mask autologin-setup-plasma.service
 systemctl --global enable steamos-powerbuttond.service
