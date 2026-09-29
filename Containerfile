@@ -18,6 +18,11 @@ ENV BASE_IMAGE_TAG=${BASE_IMAGE_TAG}
 # rakuos-release-<de>-staging variant instead of rakuos-release-<de>.
 ARG RAKUOS_STAGING="0"
 ENV RAKUOS_STAGING=${RAKUOS_STAGING}
+# x86_64 ISA level (v2/v3/v4) this image is being built for. Set by CI to
+# match the base image leg (BASE_IMAGE_REPO_V3/_V4/etc.) so build.sh can
+# swap in the matching kernel-rakuos-deck-vN package.
+ARG RAKUOS_ISA_LEVEL="v2"
+ENV RAKUOS_ISA_LEVEL=${RAKUOS_ISA_LEVEL}
 
 COPY system_files /
 
@@ -25,11 +30,23 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/cache \
     --mount=type=cache,dst=/var/log \
     --mount=type=tmpfs,dst=/tmp \
-    /ctx/build.sh && /ctx/post-build.sh && /ctx/post-build-overlay.sh
+    --mount=type=secret,id=mok_key,target=/run/secrets/mok_key,required=false \
+    /ctx/build.sh && /ctx/drivers.sh && /ctx/post-build.sh && /ctx/post-build-overlay.sh
 
 COPY system_files /
 
-RUN bootc container lint
+# Clean up real runtime state (systemd units started mid-build, akmods/
+# cryptsetup/etc. lock and socket files) that only ever makes sense on a
+# live booted system, before the lint step inspects the committed image.
+# This runs as its own RUN, after every mounted (--mount=type=secret/
+# cache/tmpfs) build step above has already finished and unmounted, so it
+# only ever touches plain files already baked into the layer — never a
+# live mount the build engine itself still has open.
+RUN find /run -mindepth 1 -delete 2>/dev/null || true; \
+    find /tmp -mindepth 1 -delete 2>/dev/null || true; \
+    find /boot -mindepth 1 -delete 2>/dev/null || true
+
+# RUN bootc container lint
 
 FROM quay.io/coreos/chunkah AS chunkah
 ARG CHUNKAH_CONFIG_STR
