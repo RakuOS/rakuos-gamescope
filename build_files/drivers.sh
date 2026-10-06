@@ -82,7 +82,7 @@ fi
 # Build the initramfs from the final, signed module set.
 depmod "$QUALIFIED_KERNEL"
 /usr/bin/dracut --no-hostonly --kver "$QUALIFIED_KERNEL" --reproducible --zstd -v \
-    --add ostree --add fido2 --add rakuos-overlay -f "/usr/lib/modules/$QUALIFIED_KERNEL/initramfs.img"
+    --add ostree --add fido2 --add rakuos-overlay --omit selinux -f "/usr/lib/modules/$QUALIFIED_KERNEL/initramfs.img"
 chmod 0600 /usr/lib/modules/"$QUALIFIED_KERNEL"/initramfs.img
 
 rm -rf /var/lib/dkms /var/cache/akmods
