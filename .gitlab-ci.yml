@@ -35,7 +35,7 @@ stages:
 .buildah-job:
   image: quay.io/buildah/stable:latest
   tags:
-    - saas-linux-2xlarge-amd64
+    - saas-linux-large-amd64
   before_script:
     - |
       case "${CI_COMMIT_BRANCH}" in
@@ -155,7 +155,7 @@ build-base:
   stage: build
   image: quay.io/fedora/fedora:latest
   tags:
-    - saas-linux-2xlarge-amd64
+    - saas-linux-large-amd64
   allow_failure: true
   script:
     - |

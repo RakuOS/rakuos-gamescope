@@ -17,15 +17,17 @@ rum remove -y ${RAKUOS_RELEASE_BAD_PKG}
 
 # ISA level (v2/v3/v4) this image is built for, set by CI via
 # --build-arg RAKUOS_ISA_LEVEL to match the base image leg. Swap the base
-# image's default kernel-rakuos-<isa> for our handheld-oriented
-# kernel-rakuos-deck-<isa> build.
+# image's default kernel-p03-raku-<isa> for the handheld P03 build,
+# kernel-p03-raku-deck-<isa> (kernel-p03-deck repo, handheld patch on).
+# The P03 spec puts -staging before the ISA suffix
+# (kernel-p03-raku-staging-v3).
 ISA_LEVEL="${RAKUOS_ISA_LEVEL:-v2}"
-KERNEL_RAKUOS_PKG="kernel-rakuos-${ISA_LEVEL}"
-KERNEL_DECK_PKG="kernel-rakuos-deck-${ISA_LEVEL}"
+STAGING_TAG=""
 if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
-    KERNEL_RAKUOS_PKG="${KERNEL_RAKUOS_PKG}-staging"
-    KERNEL_DECK_PKG="${KERNEL_DECK_PKG}-staging"
+    STAGING_TAG="-staging"
 fi
+KERNEL_RAKUOS_PKG="kernel-p03-raku${STAGING_TAG}-${ISA_LEVEL}"
+KERNEL_DECK_PKG="kernel-p03-raku-deck${STAGING_TAG}-${ISA_LEVEL}"
 
 rum remove -y \
     ${KERNEL_RAKUOS_PKG} \
@@ -43,7 +45,7 @@ rum install -y \
     ${KERNEL_DECK_PKG}-devel \
     ${KERNEL_DECK_PKG}-devel-matched
 
-# depmod/dracut for the new kernel-deck happen in drivers.sh, after akmods
+# depmod/dracut for the new deck kernel happen in drivers.sh, after akmods
 # and MOK module/kernel signing so the initramfs is built from the final,
 # signed module set (same order rakuos-base uses for its own kernel).
 
