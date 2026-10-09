@@ -20,7 +20,7 @@ ARG RAKUOS_STAGING="0"
 ENV RAKUOS_STAGING=${RAKUOS_STAGING}
 # x86_64 ISA level (v2/v3/v4) this image is being built for. Set by CI to
 # match the base image leg (BASE_IMAGE_REPO_V3/_V4/etc.) so build.sh can
-# swap in the matching kernel-p03-raku-deck-vN package.
+# swap in the matching kernel-rakuos-deck-vN package.
 ARG RAKUOS_ISA_LEVEL="v2"
 ENV RAKUOS_ISA_LEVEL=${RAKUOS_ISA_LEVEL}
 

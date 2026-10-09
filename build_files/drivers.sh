@@ -6,13 +6,12 @@ set -ouex pipefail
 # RAKUOS_STAGING persist as image ENV from that layer, so they're already
 # set here).
 ISA_LEVEL="${RAKUOS_ISA_LEVEL:-v2}"
-STAGING_TAG=""
+KERNEL_DECK_PKG="kernel-rakuos-deck-${ISA_LEVEL}"
 if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
-    STAGING_TAG="-staging"
+    KERNEL_DECK_PKG="${KERNEL_DECK_PKG}-staging"
 fi
-KERNEL_DECK_PKG="kernel-p03-raku-deck${STAGING_TAG}-${ISA_LEVEL}"
 
-# Determine the installed kernel version (kernel-p03-raku-deck-<isa>, installed
+# Determine the installed kernel version (kernel-rakuos-deck-<isa>, installed
 # by build.sh, including its -devel/-devel-matched subpackages).
 QUALIFIED_KERNEL=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' ${KERNEL_DECK_PKG})
 
