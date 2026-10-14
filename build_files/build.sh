@@ -58,7 +58,7 @@ rum install -y \
 
 ## Install packages
 # Fixme: remove --allowerasing
-rum install -y akonadi-server \
+rum install -y --skip-broken --skip-unavailable akonadi-server \
   ${RAKUOS_RELEASE_PKG} \
   steam \
   inputplumber \
