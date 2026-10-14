@@ -3,6 +3,15 @@
 set -ouex pipefail
 FEDORA_VERSION=$(rpm -E %fedora)
 
+# Terra ships disabled by default (third-party repos are opt-in), so enable
+# it here in case any packages below come from Terra; post-build.sh disables
+# it again before the image is finalized.
+rum config-manager --default --set-enabled terra
+
+# RPM Fusion is disabled in the base image too; turn its default repos back
+# on (the list base post-build.sh recorded). post-build.sh disables them again.
+rum config-manager --default --set-enabled $(cat /usr/share/rakuos/rpmfusion-default-repos)
+
 # On the staging branch (RAKUOS_STAGING=1, set via --build-arg from CI)
 # install the staging os-release identity instead of the stable one, so
 # staging images identify themselves as "RakuOS KDE Staging".
@@ -46,11 +55,6 @@ rum install -y \
 # depmod/dracut for the new kernel-deck happen in drivers.sh, after akmods
 # and MOK module/kernel signing so the initramfs is built from the final,
 # signed module set (same order rakuos-base uses for its own kernel).
-
-# Terra ships disabled by default (third-party repos are opt-in), so enable
-# it here in case any packages below come from Terra; post-build.sh disables
-# it again before the image is finalized.
-rum config-manager --set-enabled terra
 
 ## Install packages
 # Fixme: remove --allowerasing
