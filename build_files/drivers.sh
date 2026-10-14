@@ -11,59 +11,36 @@ if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
     KERNEL_DECK_PKG="${KERNEL_DECK_PKG}-staging"
 fi
 
+# Prebuilt, RakuOS-signed kernel modules (signed-kmods repo) for the deck
+# kernel: rakuos-kmod-<name>-deck, or -deck-staging for the staging kernel.
+# Nothing is compiled or signed here any more.
+KMOD_SUFFIX=""
+if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
+    KMOD_SUFFIX="-staging"
+fi
+
 # Determine the installed kernel version (kernel-rakuos-deck-<isa>, installed
 # by build.sh, including its -devel/-devel-matched subpackages).
 QUALIFIED_KERNEL=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' ${KERNEL_DECK_PKG})
 
-rum install -y akmods sbsigntools
+# The base image ships the modules for kernel-rakuos (rakuos-kmod-<name>);
+# this image swapped in kernel-rakuos-deck, so install the deck builds and
+# drop the base ones. The deck packages provide the same <name>-kmod the
+# companion packages (broadcom-wl, v4l2loopback) need.
+DECK_KMODS=(wl v4l2loopback)
+rum install -y sbsigntools $(printf "rakuos-kmod-%s-deck${KMOD_SUFFIX} " "${DECK_KMODS[@]}")
+for kmod in "${DECK_KMODS[@]}"; do
+    if rpm -q "rakuos-kmod-${kmod}${KMOD_SUFFIX}" >/dev/null 2>&1; then
+        rum remove -y "rakuos-kmod-${kmod}${KMOD_SUFFIX}"
+    fi
+done
 
-tmpdir="$(mktemp -d)"
-trap 'rm -rf "$tmpdir"' EXIT
-
-# Build akmod packages for the installed kernel-deck kernel.
-# akmods installs the resulting kmod RPM so the .ko lands in
-# /usr/lib/modules/$QUALIFIED_KERNEL/extra/ where the signing loop picks it up.
-echo "Building akmods for kernel ${QUALIFIED_KERNEL}..."
-akmods --kernels "$QUALIFIED_KERNEL" --rebuild
-# Install any built kmod RPMs from the cache
-find /var/cache/akmods -name "*.rpm" ! -name "*src.rpm" | xargs -r rum install -y
-
-# Sign all extra kernel modules with the MOK key (skipped silently if the
-# key isn't present, e.g. forks without access to the MOK Secure File).
-MOK_KEY="/run/secrets/mok_key"
-MOK_CERT="/usr/share/rakuos/sb_pubkey.der"
-SIGN_FILE="/usr/src/kernels/${QUALIFIED_KERNEL}/scripts/sign-file"
-if [[ -f "$MOK_KEY" ]] && [[ -f "$SIGN_FILE" ]]; then
-    echo "Signing all extra kernel modules..."
-    while IFS= read -r ko; do
-        case "$ko" in
-            *.ko.xz)
-                bare="${ko%.xz}"
-                xz -dk "$ko"
-                "$SIGN_FILE" sha256 "$MOK_KEY" "$MOK_CERT" "$bare"
-                xz -f "$bare"
-                ;;
-            *.ko.zst)
-                bare="${ko%.zst}"
-                zstd -dq "$ko" -o "$bare"
-                "$SIGN_FILE" sha256 "$MOK_KEY" "$MOK_CERT" "$bare"
-                zstd -qf "$bare" -o "$ko"
-                rm -f "$bare"
-                ;;
-            *.ko)
-                "$SIGN_FILE" sha256 "$MOK_KEY" "$MOK_CERT" "$ko"
-                ;;
-        esac
-        echo "  Signed: $(basename "$ko")"
-    done < <(find "/usr/lib/modules/${QUALIFIED_KERNEL}/extra" \
-        \( -name "*.ko" -o -name "*.ko.xz" -o -name "*.ko.zst" \) 2>/dev/null)
-    echo "Module signing complete."
-else
-    echo "MOK key or sign-file not available — skipping module signing."
-fi
+# Out-of-tree modules (rakuos-kmod-*-deck) arrive already signed with the
+# RakuOS key by the signed-kmods CI, so there's no module signing step here.
 
 # Sign the kernel vmlinuz with the MOK key
 VMLINUZ="/usr/lib/modules/${QUALIFIED_KERNEL}/vmlinuz"
+MOK_KEY="/run/secrets/mok_key"
 MOK_CERT_DER="/usr/share/rakuos/sb_pubkey.der"
 if [[ -f "$MOK_KEY" ]] && [[ -f "$VMLINUZ" ]] && [[ -f "$MOK_CERT_DER" ]]; then
     echo "Signing kernel ${QUALIFIED_KERNEL}..."
