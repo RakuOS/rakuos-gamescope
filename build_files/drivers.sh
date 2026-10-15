@@ -26,8 +26,18 @@ QUALIFIED_KERNEL=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' ${KERN
 # The base image ships the modules for kernel-rakuos (rakuos-kmod-<name>);
 # this image swapped in kernel-rakuos-deck, so install the deck builds and
 # drop the base ones. The deck packages provide the same <name>-kmod the
-# companion packages (broadcom-wl, v4l2loopback) need.
-DECK_KMODS=(wl v4l2loopback)
+# companion packages (broadcom-wl, v4l2loopback, xone, ...) need. Same list
+# as KMODS in rakuos-base's drivers.sh (everything but NVIDIA).
+DECK_KMODS=(
+    wl v4l2loopback
+    xone xpadneo xpad-noone
+    hid-fanatecff hid-tmff2 t150-driver new-lg4ff logitech-trueforce
+    openrazer ayaneo-leds
+    mediatek-mt7927 xtables-addons
+    intel-ipu6 intel-vision sc0710
+    nct6687d ryzen_smu zenergy
+    VirtualBox
+)
 rum install -y sbsigntools $(printf "rakuos-kmod-%s-deck${KMOD_SUFFIX} " "${DECK_KMODS[@]}")
 for kmod in "${DECK_KMODS[@]}"; do
     if rpm -q "rakuos-kmod-${kmod}${KMOD_SUFFIX}" >/dev/null 2>&1; then
