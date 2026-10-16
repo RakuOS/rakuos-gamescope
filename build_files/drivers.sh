@@ -54,6 +54,16 @@ if [ "${#BASE_KMOD_PKGS[@]}" -gt 0 ]; then
 fi
 rum install -y sbsigntools $(printf "rakuos-kmod-%s-deck${KMOD_SUFFIX} " "${DECK_KMODS[@]}")
 
+# The signed-kmods packages carry modules only for the kernels that were
+# current when they were built. One that predates this kernel installs
+# without complaint and ships nothing loadable, so fail the build instead.
+for pkg in $(printf "rakuos-kmod-%s-deck${KMOD_SUFFIX} " "${DECK_KMODS[@]}"); do
+    grep -q "^/usr/lib/modules/${QUALIFIED_KERNEL}/" < <(rpm -ql "$pkg") || {
+        echo "ERROR: $(rpm -q "$pkg") has no modules for ${QUALIFIED_KERNEL}; rebuild signed-kmods"
+        exit 1
+    }
+done
+
 # Out-of-tree modules (rakuos-kmod-*-deck) arrive already signed with the
 # RakuOS key by the signed-kmods CI, so there's no module signing step here.
 
