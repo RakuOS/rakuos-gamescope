@@ -29,6 +29,11 @@ QUALIFIED_KERNEL=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' ${KERN
 # companion packages (broadcom-wl, v4l2loopback, xone, ...) need. Same list
 # as KMODS in rakuos-base's drivers.sh (everything but NVIDIA and
 # VirtualBox).
+#
+# Both flavors provide akmod-<name>/dkms-<name> and conflict with it, so a
+# deck package can't go in while its base package is still installed. Drop
+# the base packages first, without their dependents (the companions'
+# <name>-kmod requirement is met again by the deck packages right after).
 DECK_KMODS=(
     wl v4l2loopback
     xone xpadneo xpad-noone
@@ -38,12 +43,16 @@ DECK_KMODS=(
     intel-ipu6 intel-vision sc0710
     nct6687d ryzen_smu zenergy
 )
-rum install -y sbsigntools $(printf "rakuos-kmod-%s-deck${KMOD_SUFFIX} " "${DECK_KMODS[@]}")
+BASE_KMOD_PKGS=()
 for kmod in "${DECK_KMODS[@]}"; do
     if rpm -q "rakuos-kmod-${kmod}${KMOD_SUFFIX}" >/dev/null 2>&1; then
-        rum remove -y "rakuos-kmod-${kmod}${KMOD_SUFFIX}"
+        BASE_KMOD_PKGS+=("rakuos-kmod-${kmod}${KMOD_SUFFIX}")
     fi
 done
+if [ "${#BASE_KMOD_PKGS[@]}" -gt 0 ]; then
+    rpm -e --nodeps "${BASE_KMOD_PKGS[@]}"
+fi
+rum install -y sbsigntools $(printf "rakuos-kmod-%s-deck${KMOD_SUFFIX} " "${DECK_KMODS[@]}")
 
 # Out-of-tree modules (rakuos-kmod-*-deck) arrive already signed with the
 # RakuOS key by the signed-kmods CI, so there's no module signing step here.
