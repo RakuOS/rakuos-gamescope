@@ -27,8 +27,8 @@ QUALIFIED_KERNEL=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' ${KERN
 # this image swapped in kernel-rakuos-deck, so install the deck builds and
 # drop the base ones. The deck packages provide the same <name>-kmod the
 # companion packages (broadcom-wl, v4l2loopback, xone, ...) need. Same list
-# as KMODS in rakuos-base's drivers.sh (everything but NVIDIA, VirtualBox
-# and openrazer).
+# as KMODS in rakuos-base's drivers.sh (everything but NVIDIA, VirtualBox,
+# openrazer and mediatek-mt7927).
 #
 # Both flavors provide akmod-<name>/dkms-<name> and conflict with it, so a
 # deck package can't go in while its base package is still installed. Drop
@@ -39,7 +39,7 @@ DECK_KMODS=(
     xone xpadneo xpad-noone
     hid-fanatecff hid-tmff2 t150-driver new-lg4ff logitech-trueforce
     ayaneo-leds
-    mediatek-mt7927 xtables-addons
+    xtables-addons
     intel-ipu6 intel-vision sc0710
     nct6687d ryzen_smu zenergy
 )
