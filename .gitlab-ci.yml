@@ -13,6 +13,12 @@ workflow:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - when: never
 
+# The homelab runners are slower than GitLab's large SaaS runners and run
+# several jobs at once, so give every job plenty of time. A job's timeout
+# can't exceed its runner's "Maximum job timeout" (runner settings).
+default:
+  timeout: 24 hours
+
 variables:
   # Runner tag for every job: the RakuOS homelab runners (both registered
   # with the "rakuos-homelab" tag; GitLab gives each job to whichever is
@@ -404,7 +410,6 @@ trigger-on-base-build-fail-v3:
   image: quay.io/buildah/stable:latest
   tags:
     - $RUNNER_TAG
-  timeout: 30 minutes
   variables:
     STORAGE_DRIVER: overlay
     BUILDAH_FORMAT: oci
