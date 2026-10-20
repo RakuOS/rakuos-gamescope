@@ -52,6 +52,20 @@ rum install -y \
     ${KERNEL_DECK_PKG}-devel \
     ${KERNEL_DECK_PKG}-devel-matched
 
+# protected-packages.txt comes from rakuos-base, whose post-build.sh listed
+# the kernel it installed. That kernel was just swapped out: drop it from the
+# list and protect the deck kernel instead.
+PROTECTED_FILE="/usr/share/rakuos/protected-packages.txt"
+sed -i -E "/^[[:space:]]*${KERNEL_RAKUOS_PKG}(-devel-matched)?[[:space:]]*$/d" "$PROTECTED_FILE"
+cat >> "$PROTECTED_FILE" << EOF
+
+# Deck kernel (from rakuos-gamescope/build_files/build.sh)
+${KERNEL_DECK_PKG}
+${KERNEL_DECK_PKG}-devel-matched
+EOF
+grep -qx "${KERNEL_DECK_PKG}" "$PROTECTED_FILE" \
+    || { echo "ERROR: ${KERNEL_DECK_PKG} missing from $PROTECTED_FILE"; exit 1; }
+
 # depmod/dracut for the new kernel-deck happen in drivers.sh, after akmods
 # and MOK module/kernel signing so the initramfs is built from the final,
 # signed module set (same order rakuos-base uses for its own kernel).
