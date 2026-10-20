@@ -112,10 +112,10 @@ sed -i -e '$a\' "$PACKAGES_LIST"
 echo "[rakuos] stale overlay state cleared — prebake will write fresh first-boot state."
 echo "[rakuos] Post-build seed complete."
 
-echo "Appending KDE protected packages to protected-packages.txt..."
+echo "Appending gamescope protected packages to protected-packages.txt..."
 cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
 
-# KDE DE packages (from rakuos-kde/build_files/build.sh)
+# Gamescope packages (from rakuos-gamescope/build_files/build.sh)
   steam
   inputplumber
   wireplumber
@@ -125,13 +125,6 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   gamescope-session
   gamescope-session-steam
 EOF
-# Protect the akmods/rpm-build chain from getting autoremoved as "unused
-# deps" of selinux-policy — the chain itself (akmod-wl -> akmods -> rpm-build)
-# has no real selinux Requires, it's just dnf's install-reason bookkeeping
-# treating them as orphans once selinux-policy (which pulled rpm-plugin-selinux)
-# is gone. mark install only flips reason=dependency -> reason=user in the
-# local db; it does not install/reinstall anything.
-
 rum remove -y 'selinux-policy*' 'policycoreutils-gui'
 rum install -y libselinux
 
