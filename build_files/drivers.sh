@@ -36,11 +36,6 @@ QUALIFIED_KERNEL=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' ${KERN
 # <name>-kmod requirement is met again by the deck packages right after).
 DECK_KMODS=(
     wl v4l2loopback
-    xone xpadneo xpad-noone
-    hid-fanatecff hid-tmff2 t150-driver new-lg4ff logitech-trueforce
-    ayaneo-leds
-    sc0710
-    nct6687d ryzen_smu zenergy
 )
 BASE_KMOD_PKGS=()
 for kmod in "${DECK_KMODS[@]}"; do
