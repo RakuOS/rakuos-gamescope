@@ -33,6 +33,7 @@ stages:
   - dispatch
 
 .buildah-job:
+  timeout: 24 hours
   image: quay.io/buildah/stable:latest
   tags:
     - saas-linux-large-amd64
@@ -41,7 +42,7 @@ stages:
       case "${CI_COMMIT_BRANCH}" in
         "${CI_DEFAULT_BRANCH}")
           export BRANCH_SLUG="${DEFAULT_TAG}"
-          export FEDORA_VERSION="44"
+          export FEDORA_VERSION="45"
           ;;
         "staging")
           export BRANCH_SLUG="staging"
@@ -79,6 +80,7 @@ stages:
     BUILDAH_FORMAT: oci
 
 build-base:
+  timeout: 24 hours
   extends: .buildah-job
   stage: build
   script:
@@ -152,6 +154,7 @@ build-base:
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
 .trigger-on-build-fail:
+  timeout: 24 hours
   stage: build
   image: quay.io/fedora/fedora:latest
   tags:
@@ -222,12 +225,14 @@ build-base:
       when: on_failure
 
 trigger-on-base-build-fail:
+  timeout: 24 hours
   extends: .trigger-on-build-fail
   needs:
     - job: build-base
       artifacts: false
 
 build-base-v4:
+  timeout: 24 hours
   extends: .buildah-job
   stage: build
   script:
@@ -302,6 +307,7 @@ build-base-v4:
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
 build-base-v3:
+  timeout: 24 hours
   extends: .buildah-job
   stage: build
   script:
@@ -376,12 +382,14 @@ build-base-v3:
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
 trigger-on-base-build-fail-v4:
+  timeout: 24 hours
   extends: .trigger-on-build-fail
   needs:
     - job: build-base-v4
       artifacts: false
 
 trigger-on-base-build-fail-v3:
+  timeout: 24 hours
   extends: .trigger-on-build-fail
   needs:
     - job: build-base-v3
@@ -395,10 +403,10 @@ trigger-on-base-build-fail-v3:
 #   GITLAB_API_TOKEN    — api-scoped token for pipeline cancellation
 
 .image-test-job:
+  timeout: 24 hours
   image: quay.io/buildah/stable:latest
   tags:
     - saas-linux-medium-amd64
-  timeout: 30 minutes
   variables:
     STORAGE_DRIVER: overlay
     BUILDAH_FORMAT: oci
@@ -411,6 +419,7 @@ trigger-on-base-build-fail-v3:
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
 test-image-standard:
+  timeout: 24 hours
   extends: .image-test-job
   stage: test-iso
   needs:
@@ -440,6 +449,7 @@ test-image-standard:
       echo "RPM DB stress test passed."
 
 test-image-standard-v4:
+  timeout: 24 hours
   extends: .image-test-job
   stage: test-iso
   needs:
@@ -469,6 +479,7 @@ test-image-standard-v4:
       echo "RPM DB stress test passed."
 
 test-image-standard-v3:
+  timeout: 24 hours
   extends: .image-test-job
   stage: test-iso
   needs:
@@ -498,6 +509,7 @@ test-image-standard-v3:
       echo "RPM DB stress test passed."
 
 .trigger-on-iso-fail:
+  timeout: 24 hours
   stage: test-iso
   image: quay.io/fedora/fedora:latest
   tags:
@@ -536,24 +548,28 @@ test-image-standard-v3:
       when: on_failure
 
 trigger-on-image-standard-fail:
+  timeout: 24 hours
   extends: .trigger-on-iso-fail
   needs:
     - job: test-image-standard
       artifacts: false
 
 trigger-on-image-standard-fail-v4:
+  timeout: 24 hours
   extends: .trigger-on-iso-fail
   needs:
     - job: test-image-standard-v4
       artifacts: false
 
 trigger-on-image-standard-fail-v3:
+  timeout: 24 hours
   extends: .trigger-on-iso-fail
   needs:
     - job: test-image-standard-v3
       artifacts: false
 
 push-tags-base:
+  timeout: 24 hours
   stage: push
   image: quay.io/buildah/stable:latest
   tags:
@@ -610,6 +626,7 @@ push-tags-base:
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
 sign-image-standard:
+  timeout: 24 hours
   stage: sign
   image: quay.io/buildah/stable:latest
   tags:
@@ -659,6 +676,7 @@ sign-image-standard:
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
 push-tags-base-v4:
+  timeout: 24 hours
   stage: push
   image: quay.io/buildah/stable:latest
   tags:
@@ -715,6 +733,7 @@ push-tags-base-v4:
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
 push-tags-base-v3:
+  timeout: 24 hours
   stage: push
   image: quay.io/buildah/stable:latest
   tags:
@@ -771,6 +790,7 @@ push-tags-base-v3:
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
 sign-image-standard-v4:
+  timeout: 24 hours
   stage: sign
   image: quay.io/buildah/stable:latest
   tags:
@@ -820,6 +840,7 @@ sign-image-standard-v4:
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
 sign-image-standard-v3:
+  timeout: 24 hours
   stage: sign
   image: quay.io/buildah/stable:latest
   tags:
@@ -869,6 +890,7 @@ sign-image-standard-v3:
     - if: '$CI_COMMIT_BRANCH == "rakuosel"'
 
 cleanup-temp-tags:
+  timeout: 24 hours
   stage: cleanup
   image: quay.io/buildah/stable:latest
   tags:
@@ -904,6 +926,7 @@ cleanup-temp-tags:
       when: always
 
 notify-discord:
+  timeout: 24 hours
   stage: dispatch
   image: curlimages/curl:latest
   tags:
