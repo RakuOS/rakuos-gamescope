@@ -1,50 +1,56 @@
 #!/usr/bin/bash
+# RakuOS branch selection for Steam's Game Mode (Settings › System ›
+# OS Update Channel). Steam runs /usr/bin/steamos-select-branch (as root,
+# through pkexec), which calls this:
+#
+#   -c        print the current branch
+#   -l        list the branches Steam can offer
+#   <branch>  switch to that branch
+#
+# Steam's branches map to RakuOS image tags: rel = latest (stable),
+# rc = staging. Switching keeps the booted image's name, so a -v3 or -v4
+# image stays -v3 or -v4; only the tag changes. `bootc switch` is RakuOS's
+# wrapper, which prepares the package layers for the new image before the
+# reboot. Output from bootc goes to the journal: journalctl -t rakuos-steam-branch
+set -euo pipefail
 
-set -e
+booted_ref() {
+    bootc status --json --booted | jq -r '.status.booted.image.image.image // empty'
+}
 
-source /etc/os-release
-
-if [[ $# -eq 1 ]]; then
-  case "$1" in
+case "${1:-}" in
     -c)
-      branch=$(bootc status --json --booted | jq -r '.status.booted.image.image.image | split(":")[-1]')
-      case $branch in
-        latest|stable)
-          echo rel
-          exit 0
-          ;;
-        staging)
-          echo rc
-          exit 0
-          ;;
-        *)
-          # This can happen on CI builds or when downgrading from a newer build that knows of more branches.  The update
-          # path should decide how to handle it.
-          echo >&2 "Warning: Unrecognized currently selected branch name '$branch', updates may not succeed."
-          echo "$branch"
-          exit 0
-          ;;
-      esac
-      ;;
+        ref=$(booted_ref)
+        case "${ref##*:}" in
+            latest|stable) echo rel ;;
+            staging)       echo rc ;;
+            *)
+                echo >&2 "Warning: unrecognized branch '${ref##*:}'; updates may not work as expected."
+                echo "${ref##*:}"
+                ;;
+        esac
+        ;;
     -l)
-      echo rel
-      echo rc
-      echo staging
-      echo stable
-      echo latest
-      exit 0
-      ;;
-    rel|latest|stable)
-      runcon system_u:unconfined_r:unconfined_t:s0 \
-        /usr/bin/bootc rebase quay.io/rakuos/rakuos-gamescope:latest
-      exit 0
-      ;;
-    rc|staging)
-      runcon system_u:unconfined_r:unconfined_t:s0 \
-        /usr/bin/bootc rebase quay.io/rakuos/rakuos-gamescope:staging
-      exit 0
-      ;;
-  esac
-fi
-
-echo "Usage: steamos-select-branch <stable|testing|>" 1>&2
+        echo rel
+        echo rc
+        ;;
+    rel|latest|stable|rc|staging|beta)
+        case "$1" in
+            rel|latest|stable) tag=latest ;;
+            *)                 tag=staging ;;
+        esac
+        ref=$(booted_ref)
+        [ -n "$ref" ] || { echo >&2 "Can't tell which image is booted."; exit 1; }
+        repo=${ref%:*}
+        if [ "${ref##*:}" = "$tag" ]; then
+            exit 0
+        fi
+        logger -t rakuos-steam-branch "switching $ref -> $repo:$tag"
+        bootc switch "$repo:$tag" 2>&1 | logger -t rakuos-steam-branch
+        exit "${PIPESTATUS[0]}"
+        ;;
+    *)
+        echo "Usage: steamos-select-branch -c | -l | rel | rc" >&2
+        exit 1
+        ;;
+esac
