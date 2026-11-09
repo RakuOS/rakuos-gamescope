@@ -1,1 +1,17 @@
-../../../usr/share/applications/steamos-return-gamemode.desktop
+[Desktop Entry]
+Comment[en_US]=
+Comment=
+Exec=rakuos-session-select steam-now
+GenericName[en_US]=
+GenericName=
+Icon=steam
+MimeType=
+Name[en_US]=Return to Gaming Mode
+Name=Return to Gaming Mode
+Path=
+StartupNotify=false
+Terminal=false
+TerminalOptions=
+Type=Application
+X-KDE-SubstituteUID=false
+X-KDE-Username=
