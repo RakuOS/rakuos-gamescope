@@ -7,8 +7,10 @@
 #   -l        list the branches Steam can offer
 #   <branch>  switch to that branch
 #
-# Steam's branches map to RakuOS image tags: rel = latest (stable),
-# rc = staging. Switching keeps the booted image's name, so a -v3 or -v4
+# Steam's branches map to RakuOS image tags: rel = latest (Steam shows
+# "Stable"), beta = staging ("Beta"). Steam only has labels for rel, beta
+# and main without its advanced channel option (rc and bc show as blank),
+# so -c and -l use those; rc, bc and main are still accepted as staging. Switching keeps the booted image's name, so a -v3 or -v4
 # image stays -v3 or -v4; only the tag changes. `bootc switch` is RakuOS's
 # wrapper, which prepares the package layers for the new image before the
 # reboot. Output from bootc goes to the journal: journalctl -t rakuos-steam-branch
@@ -23,7 +25,7 @@ case "${1:-}" in
         ref=$(booted_ref)
         case "${ref##*:}" in
             latest|stable) echo rel ;;
-            staging)       echo rc ;;
+            staging)       echo beta ;;
             *)
                 echo >&2 "Warning: unrecognized branch '${ref##*:}'; updates may not work as expected."
                 echo "${ref##*:}"
@@ -32,9 +34,9 @@ case "${1:-}" in
         ;;
     -l)
         echo rel
-        echo rc
+        echo beta
         ;;
-    rel|latest|stable|rc|staging|beta)
+    rel|latest|stable|beta|rc|bc|main|staging)
         case "$1" in
             rel|latest|stable) tag=latest ;;
             *)                 tag=staging ;;
@@ -50,7 +52,7 @@ case "${1:-}" in
         exit "${PIPESTATUS[0]}"
         ;;
     *)
-        echo "Usage: steamos-select-branch -c | -l | rel | rc" >&2
+        echo "Usage: steamos-select-branch -c | -l | rel | beta" >&2
         exit 1
         ;;
 esac
