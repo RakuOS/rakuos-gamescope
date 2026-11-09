@@ -16,8 +16,25 @@
 # reboot. Output from bootc goes to the journal: journalctl -t rakuos-steam-branch
 set -euo pipefail
 
+# The booted image, e.g. quay.io/rakuos/rakuos-gamescope-v3:staging. Steam
+# runs -c as the user, without pkexec, and `bootc status` needs root, so
+# read the booted deployment's .origin file (world-readable), found through
+# the ostree= kernel argument. bootc is the fallback (as root).
 booted_ref() {
-    bootc status --json --booted | jq -r '.status.booted.image.image.image // empty'
+    local boot dep ref
+    boot=$(tr ' ' '\n' < /proc/cmdline | sed -n 's/^ostree=//p')
+    if [ -n "$boot" ] && dep=$(readlink -f "/sysroot$boot") && [ -r "$dep.origin" ]; then
+        ref=$(sed -n 's/^container-image-reference=//p' "$dep.origin" | head -n1)
+    fi
+    if [ -z "${ref:-}" ] && [ "$(id -u)" = 0 ]; then
+        ref=$(bootc status --json --booted | jq -r '.status.booted.image.image.image // empty')
+    fi
+    # Drop the ostree transport prefix (ostree-unverified-registry:,
+    # ostree-image-signed:docker://, ...).
+    ref=${ref#ostree-*registry:}
+    ref=${ref#ostree-*:docker://}
+    ref=${ref#docker://}
+    echo "$ref"
 }
 
 case "${1:-}" in
