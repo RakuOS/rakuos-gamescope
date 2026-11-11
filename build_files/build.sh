@@ -24,51 +24,44 @@ fi
 
 rum remove -y ${RAKUOS_RELEASE_BAD_PKG}
 
-# ISA level (v2/v3/v4) this image is built for, set by CI via
-# --build-arg RAKUOS_ISA_LEVEL to match the base image leg. Swap the base
-# image's default kernel-rakuos-<isa> for our handheld-oriented
-# kernel-rakuos-deck-<isa> build.
-ISA_LEVEL="${RAKUOS_ISA_LEVEL:-v2}"
-KERNEL_RAKUOS_PKG="kernel-rakuos-${ISA_LEVEL}"
-KERNEL_DECK_PKG="kernel-rakuos-deck-${ISA_LEVEL}"
-if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
-    KERNEL_RAKUOS_PKG="${KERNEL_RAKUOS_PKG}-staging"
-    KERNEL_DECK_PKG="${KERNEL_DECK_PKG}-staging"
-fi
+# Swap the base image's kernels (both kernel-rakuos variants) for both
+# handheld-oriented kernel-rakuos-deck variants, for the ISA level and
+# channel CI builds this image for (see kernels.sh).
+source "$(dirname "$(readlink -f "$0")")/kernels.sh"
 
-rum remove -y \
-    ${KERNEL_RAKUOS_PKG} \
-    ${KERNEL_RAKUOS_PKG}-core \
-    ${KERNEL_RAKUOS_PKG}-modules \
-    ${KERNEL_RAKUOS_PKG}-devel \
-    ${KERNEL_RAKUOS_PKG}-devel-matched
+# shellcheck disable=SC2046 # one word per package
+rum remove -y $(kernel_subpkgs "${BASE_KERNEL_PKGS[@]}")
 
+# The removed kernels' directories can still hold files no package owns
+# (the anti-cheat kernel's vmlinuz.alternate, the initramfs images).
 rm -rf /boot/* /usr/lib/modules/* /lib/modules/*
 
-rum install -y \
-    ${KERNEL_DECK_PKG} \
-    ${KERNEL_DECK_PKG}-core \
-    ${KERNEL_DECK_PKG}-modules \
-    ${KERNEL_DECK_PKG}-devel \
-    ${KERNEL_DECK_PKG}-devel-matched
+# shellcheck disable=SC2046 # one word per package
+rum install -y $(kernel_subpkgs "${KERNEL_PKGS[@]}")
 
 # protected-packages.txt comes from rakuos-base, whose post-build.sh listed
-# the kernel it installed. That kernel was just swapped out: drop it from the
-# list and protect the deck kernel instead.
+# the kernels it installed. Those were just swapped out: drop them from the
+# list and protect the deck kernels instead.
 PROTECTED_FILE="/usr/share/rakuos/protected-packages.txt"
-sed -i -E "/^[[:space:]]*${KERNEL_RAKUOS_PKG}(-devel-matched)?[[:space:]]*$/d" "$PROTECTED_FILE"
+for pkg in "${BASE_KERNEL_PKGS[@]}"; do
+    sed -i -E "/^[[:space:]]*${pkg}(-devel-matched)?[[:space:]]*$/d" "$PROTECTED_FILE"
+done
 cat >> "$PROTECTED_FILE" << EOF
 
-# Deck kernel (from rakuos-gamescope/build_files/build.sh)
-${KERNEL_DECK_PKG}
-${KERNEL_DECK_PKG}-devel-matched
+# Deck kernels (from rakuos-gamescope/build_files/build.sh)
+${KERNEL_PKG}
+${KERNEL_PKG}-devel-matched
+${KERNEL_AC_PKG}
+${KERNEL_AC_PKG}-devel-matched
 EOF
-grep -qx "${KERNEL_DECK_PKG}" "$PROTECTED_FILE" \
-    || { echo "ERROR: ${KERNEL_DECK_PKG} missing from $PROTECTED_FILE"; exit 1; }
+for pkg in "${KERNEL_PKGS[@]}"; do
+    grep -qx "${pkg}" "$PROTECTED_FILE" \
+        || { echo "ERROR: ${pkg} missing from $PROTECTED_FILE"; exit 1; }
+done
 
-# depmod/dracut for the new kernel-deck happen in drivers.sh, after akmods
-# and MOK module/kernel signing so the initramfs is built from the final,
-# signed module set (same order rakuos-base uses for its own kernel).
+# depmod/dracut for the deck kernels happen in drivers.sh, after the kmod
+# swap and kernel signing so each initramfs is built from the final, signed
+# module set (same order rakuos-base uses for its own kernels).
 
 ## Install packages
 # Fixme: remove --allowerasing
