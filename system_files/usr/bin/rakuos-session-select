@@ -11,8 +11,16 @@ case "$SESSION" in
     "plasma"|"plasma-now")
         pkexec /usr/libexec/os-session-switch plasma
         steam -shutdown
-        systemctl --user stop gamescope-session.target
-        pkexec /usr/libexec/os-restart-login
+        # Stop the whole graphical session, not just gamescope: the user's
+        # systemd keeps running across the relogin, and a graphical-session
+        # .target left active from Game Mode lets Plasma's autostart apps
+        # (After=graphical-session.target) start before KWin is up, so they
+        # all fail with no Wayland display, and keeps services bound to it
+        # (portals) on the dead gamescope display. This script runs inside
+        # the gamescope session and is killed when it stops, so the rest
+        # runs in its own transient unit.
+        systemd-run --user --collect --quiet --unit="rakuos-to-plasma-$$" \
+            /usr/bin/bash -c 'systemctl --user stop gamescope-session.target xdg-desktop-autostart.target graphical-session.target; pkexec /usr/libexec/os-restart-login'
         ;;
     "steam-persistent")
         sudo systemctl mask autologin-setup-plasma.service

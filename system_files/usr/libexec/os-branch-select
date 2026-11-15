@@ -1,50 +1,75 @@
 #!/usr/bin/bash
+# RakuOS branch selection for Steam's Game Mode (Settings › System ›
+# OS Update Channel). Steam runs /usr/bin/steamos-select-branch (as root,
+# through pkexec), which calls this:
+#
+#   -c        print the current branch
+#   -l        list the branches Steam can offer
+#   <branch>  switch to that branch
+#
+# Steam's branches map to RakuOS image tags: rel = latest (Steam shows
+# "Stable"), beta = staging ("Beta"). Steam only has labels for rel, beta
+# and main without its advanced channel option (rc and bc show as blank),
+# so -c and -l use those; rc, bc and main are still accepted as staging. Switching keeps the booted image's name, so a -v3 or -v4
+# image stays -v3 or -v4; only the tag changes. `bootc switch` is RakuOS's
+# wrapper, which prepares the package layers for the new image before the
+# reboot. Output from bootc goes to the journal: journalctl -t rakuos-steam-branch
+set -euo pipefail
 
-set -e
+# The booted image, e.g. quay.io/rakuos/rakuos-gamescope-v3:staging. Steam
+# runs -c as the user, without pkexec, and `bootc status` needs root, so
+# read the booted deployment's .origin file (world-readable), found through
+# the ostree= kernel argument. bootc is the fallback (as root).
+booted_ref() {
+    local boot dep ref
+    boot=$(tr ' ' '\n' < /proc/cmdline | sed -n 's/^ostree=//p')
+    if [ -n "$boot" ] && dep=$(readlink -f "/sysroot$boot") && [ -r "$dep.origin" ]; then
+        ref=$(sed -n 's/^container-image-reference=//p' "$dep.origin" | head -n1)
+    fi
+    if [ -z "${ref:-}" ] && [ "$(id -u)" = 0 ]; then
+        ref=$(bootc status --json --booted | jq -r '.status.booted.image.image.image // empty')
+    fi
+    # Drop the ostree transport prefix (ostree-unverified-registry:,
+    # ostree-image-signed:docker://, ...).
+    ref=${ref#ostree-*registry:}
+    ref=${ref#ostree-*:docker://}
+    ref=${ref#docker://}
+    echo "$ref"
+}
 
-source /etc/os-release
-
-if [[ $# -eq 1 ]]; then
-  case "$1" in
+case "${1:-}" in
     -c)
-      branch=$(bootc status --json --booted | jq -r '.status.booted.image.image.image | split(":")[-1]')
-      case $branch in
-        latest|stable)
-          echo rel
-          exit 0
-          ;;
-        staging)
-          echo rc
-          exit 0
-          ;;
-        *)
-          # This can happen on CI builds or when downgrading from a newer build that knows of more branches.  The update
-          # path should decide how to handle it.
-          echo >&2 "Warning: Unrecognized currently selected branch name '$branch', updates may not succeed."
-          echo "$branch"
-          exit 0
-          ;;
-      esac
-      ;;
+        ref=$(booted_ref)
+        case "${ref##*:}" in
+            latest|stable) echo rel ;;
+            staging)       echo beta ;;
+            *)
+                echo >&2 "Warning: unrecognized branch '${ref##*:}'; updates may not work as expected."
+                echo "${ref##*:}"
+                ;;
+        esac
+        ;;
     -l)
-      echo rel
-      echo rc
-      echo staging
-      echo stable
-      echo latest
-      exit 0
-      ;;
-    rel|latest|stable)
-      runcon system_u:unconfined_r:unconfined_t:s0 \
-        /usr/bin/bootc rebase quay.io/rakuos/rakuos-gamescope:latest
-      exit 0
-      ;;
-    rc|staging)
-      runcon system_u:unconfined_r:unconfined_t:s0 \
-        /usr/bin/bootc rebase quay.io/rakuos/rakuos-gamescope:staging
-      exit 0
-      ;;
-  esac
-fi
-
-echo "Usage: steamos-select-branch <stable|testing|>" 1>&2
+        echo rel
+        echo beta
+        ;;
+    rel|latest|stable|beta|rc|bc|main|staging)
+        case "$1" in
+            rel|latest|stable) tag=latest ;;
+            *)                 tag=staging ;;
+        esac
+        ref=$(booted_ref)
+        [ -n "$ref" ] || { echo >&2 "Can't tell which image is booted."; exit 1; }
+        repo=${ref%:*}
+        if [ "${ref##*:}" = "$tag" ]; then
+            exit 0
+        fi
+        logger -t rakuos-steam-branch "switching $ref -> $repo:$tag"
+        bootc switch "$repo:$tag" 2>&1 | logger -t rakuos-steam-branch
+        exit "${PIPESTATUS[0]}"
+        ;;
+    *)
+        echo "Usage: steamos-select-branch -c | -l | rel | beta" >&2
+        exit 1
+        ;;
+esac

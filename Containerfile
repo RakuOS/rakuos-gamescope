@@ -20,7 +20,7 @@ ARG RAKUOS_STAGING="0"
 ENV RAKUOS_STAGING=${RAKUOS_STAGING}
 # x86_64 ISA level (v2/v3/v4) this image is being built for. Set by CI to
 # match the base image leg (BASE_IMAGE_REPO_V3/_V4/etc.) so build.sh can
-# swap in the matching kernel-rakuos-deck-vN package.
+# swap in the matching kernel-rakuos-deck-vN and -deck-ac-vN kernels.
 ARG RAKUOS_ISA_LEVEL="v2"
 ENV RAKUOS_ISA_LEVEL=${RAKUOS_ISA_LEVEL}
 
@@ -31,7 +31,7 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/log \
     --mount=type=tmpfs,dst=/tmp \
     --mount=type=secret,id=mok_key,target=/run/secrets/mok_key,required=false \
-    /ctx/build.sh && /ctx/drivers.sh && /ctx/post-build.sh && /ctx/post-build-overlay.sh
+    /ctx/build.sh && /ctx/drivers.sh && /ctx/post-build.sh && /ctx/post-build-overlay.sh && /ctx/assign-components.sh generated && /ctx/reset-mtimes.sh
 
 COPY system_files /
 
@@ -42,13 +42,22 @@ COPY system_files /
 # cache/tmpfs) build step above has already finished and unmounted, so it
 # only ever touches plain files already baked into the layer — never a
 # live mount the build engine itself still has open.
-RUN find /run -mindepth 1 -delete 2>/dev/null || true; \
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    --mount=type=bind,source=system_files,target=/run/rakuos-system-files,ro \
+    /ctx/assign-components.sh files rakuos-gamescope-files /run/rakuos-system-files; \
+    # Not /run/src: CI binds the build directory (the checkout, Containerfile
+    # included) there for every RUN (-v $(pwd):/run/src), and deleting it
+    # emptied the checkout before the final build step could read it.
+    find /run -mindepth 1 -maxdepth 1 ! -path /run/src -exec rm -rf {} + 2>/dev/null || true; \
     find /tmp -mindepth 1 -delete 2>/dev/null || true; \
-    find /boot -mindepth 1 -delete 2>/dev/null || true
+    find /boot -mindepth 1 -delete 2>/dev/null || true; \
+    /ctx/reset-mtimes.sh
 
 # RUN bootc container lint
 
-FROM quay.io/coreos/chunkah AS chunkah
+# chunkah v0.7.1, pinned: another version can plan layers differently,
+# which would change every layer of the next update.
+FROM quay.io/coreos/chunkah@sha256:71e593421c5de7dcc7c8c5c50e98d3bac572055a76f399f61a491d123c20a523 AS chunkah
 # org.rakuos.kernel.release: the kernel release of this image, what `uname -r`
 # shows once it's booted, read from the finished root filesystem (the only
 # kernel with a vmlinuz). It can't be a CI --label like
@@ -58,10 +67,13 @@ RUN --mount=from=builder,src=/,target=/chunkah,ro \
     --mount=type=bind,target=/run/src,rw \
         KREL=$(basename "$(dirname "$(ls /chunkah/usr/lib/modules/*/vmlinuz | head -1)")") && \
         [ -n "$KREL" ] && \
-        chunkah build --prune /sysroot/ --max-layers 128 --compressed --threads 4 \
+        chunkah build --prune /sysroot/ --max-layers 256 --compressed --threads 4 \
           --label ostree.commit- --label ostree.final-diffid- \
           --label "org.rakuos.kernel.release=${KREL}" \
           > /run/src/out.ociarchive
 
-FROM oci-archive:out.ociarchive
+# Built on its own (--target final) after the chunkah stage has written
+# out.ociarchive: buildah doesn't know this stage depends on that file and
+# could otherwise start it first ("archive file not found").
+FROM oci-archive:out.ociarchive AS final
 LABEL containers.bootc=1

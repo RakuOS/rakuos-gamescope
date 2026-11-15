@@ -117,6 +117,9 @@ build-base:
       fi
 
     - |
+      # Two steps: chunkah writes out.ociarchive, then the final stage is
+      # built from it. In one build buildah could start the final stage
+      # before the archive exists ("archive file not found").
       buildah build \
         --file Containerfile \
         --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
@@ -125,6 +128,14 @@ build-base:
         --skip-unused-stages=false \
         -v "$(pwd)":/run/src --security-opt=label=disable \
         ${MOK_SECRET_FLAG} \
+        --target chunkah \
+        .
+      buildah build \
+        --file Containerfile \
+        --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
+        --build-arg RAKUOS_STAGING="${RAKUOS_STAGING}" \
+        --build-arg RAKUOS_ISA_LEVEL="v2" \
+        --target final \
         --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         --label "org.opencontainers.image.version=${BRANCH_SLUG}.${DATE_TAG}" \
         --label "org.opencontainers.image.description=${IMAGE_DESC}" \
@@ -269,6 +280,9 @@ build-base-v4:
       fi
 
     - |
+      # Two steps: chunkah writes out.ociarchive, then the final stage is
+      # built from it. In one build buildah could start the final stage
+      # before the archive exists ("archive file not found").
       buildah build \
         --file Containerfile \
         --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
@@ -278,6 +292,15 @@ build-base-v4:
         --skip-unused-stages=false \
         -v "$(pwd)":/run/src --security-opt=label=disable \
         ${MOK_SECRET_FLAG} \
+        --target chunkah \
+        .
+      buildah build \
+        --file Containerfile \
+        --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
+        --build-arg RAKUOS_STAGING="${RAKUOS_STAGING}" \
+        --build-arg BASE_IMAGE_REPO="${BASE_IMAGE_REPO_V4}" \
+        --build-arg RAKUOS_ISA_LEVEL="v4" \
+        --target final \
         --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         --label "org.opencontainers.image.version=${BRANCH_SLUG}.${DATE_TAG}" \
         --label "org.opencontainers.image.description=${IMAGE_DESC}" \
@@ -344,6 +367,9 @@ build-base-v3:
       fi
 
     - |
+      # Two steps: chunkah writes out.ociarchive, then the final stage is
+      # built from it. In one build buildah could start the final stage
+      # before the archive exists ("archive file not found").
       buildah build \
         --file Containerfile \
         --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
@@ -353,6 +379,15 @@ build-base-v3:
         --skip-unused-stages=false \
         -v "$(pwd)":/run/src --security-opt=label=disable \
         ${MOK_SECRET_FLAG} \
+        --target chunkah \
+        .
+      buildah build \
+        --file Containerfile \
+        --build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
+        --build-arg RAKUOS_STAGING="${RAKUOS_STAGING}" \
+        --build-arg BASE_IMAGE_REPO="${BASE_IMAGE_REPO_V3}" \
+        --build-arg RAKUOS_ISA_LEVEL="v3" \
+        --target final \
         --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         --label "org.opencontainers.image.version=${BRANCH_SLUG}.${DATE_TAG}" \
         --label "org.opencontainers.image.description=${IMAGE_DESC}" \

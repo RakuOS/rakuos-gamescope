@@ -1,58 +1,106 @@
 #!/usr/bin/bash
-
-# The Steam client is known to call this script with the following parameter combinations:
-# steamos-update --supports-duplicate-detection     -- should do nothing
-# steamos-update --enable-duplicate-detection check -- should check for update
-# steamos-update check                              -- should check for update
-# steamos-update --enable-duplicate-detection       -- should perform an update
-# steamos-update                                    -- should perform an update
+# RakuOS system update for Steam's Game Mode (Settings › System › Software
+# Updates). Steam runs /usr/bin/steamos-update, which (as root, through
+# pkexec) calls this with one argument:
 #
-# For check:
-# - If there is no update available, exit with code 7
-# - If there is an update available, print "Update available: <VERSION>" and exit with code 0
-#   Steam displays "<VERSION>" when developer mode is enabled
-# - If there is an error, exit with a non-zero code other than 7
+#   check   exit 7: nothing to update
+#           exit 0 and print "Update available: <version>": an update exists
+#           any other exit: error
+#   update  print progress as "<0-100>%" lines, exit 0 when done
+#           (Steam then offers a restart), any exit other than 0/7: error
 #
-# For update:
-# - Begin the OS update process and continuously output the percentage completion as
-#   an integer value between 0-100 followed by a '%' character and newline
-# - If the update completes successfully, exit with code 0
-# - If there is an error, exit with a non-zero code other than 7
+# What counts as an update on RakuOS:
+#   - a new image (bootc). `bootc upgrade` is RakuOS's wrapper: after it
+#     stages the image it runs `rum layer-prepare`, which reinstalls the
+#     packages you added (the package layers) for the new image, at their
+#     newest versions. Nothing may change the live layers after that, so
+#     with a new image this is the whole update.
+#   - otherwise, newer versions of the packages in your layers
+#     (`rum check-upgrade`), installed live with `rum -y upgrade`.
+#
+# Only the percentages go to stdout (Steam reads them); everything the
+# tools print goes to the journal: journalctl -t rakuos-steam-update
+set -uo pipefail
 
-check_for_update() {
-    timeout 1 bash -c 'cat < /dev/null > /dev/tcp/1.1.1.1/53' 2>/dev/null || exit 2
+TAG=rakuos-steam-update
+log() { logger -t "$TAG" -- "$*"; }
+# Run a command with its output in the journal; return its exit status.
+logged() {
+    log "running: $*"
+    "$@" 2>&1 | logger -t "$TAG"
+    return "${PIPESTATUS[0]}"
+}
 
-    if bootc upgrade --check 2>&1 | grep "No changes in:"; then
-        exit 7
-    else
-        echo "Update available: unknown-version"
+online() {
+    timeout 5 bash -c 'cat < /dev/null > /dev/tcp/quay.io/443' 2>/dev/null
+}
+
+# Image update: prints the new version (or digest) when there is one.
+image_update() {
+    local out
+    out=$(bootc upgrade --check 2>&1) || { log "bootc upgrade --check failed: $out"; return 2; }
+    log "bootc upgrade --check: $out"
+    if grep -q '^No changes in' <<< "$out"; then
+        return 1
+    fi
+    local version
+    version=$(sed -n 's/^ *Version: *//p' <<< "$out" | head -n1)
+    [ -n "$version" ] || version=$(sed -n 's/^ *Digest: *sha256:\(.\{12\}\).*/\1/p' <<< "$out" | head -n1)
+    echo "${version:-new image}"
+    return 0
+}
+
+# Package layer updates: prints how many.
+package_updates() {
+    [ -e /var/lib/rakuos/layers.enabled ] || return 1
+    local out count
+    out=$(rum check-upgrade --json 2>/dev/null) || true
+    count=$(jq -r '(.updates // []) | length' <<< "$out" 2>/dev/null)
+    [ -n "$count" ] && [ "$count" -gt 0 ] || return 1
+    echo "$count"
+}
+
+do_check() {
+    online || { log "check: offline"; exit 2; }
+    local image packages rc
+    image=$(image_update); rc=$?
+    [ "$rc" = 2 ] && exit 2
+    if [ "$rc" = 0 ]; then
+        echo "Update available: $image"
         exit 0
     fi
-}
-
-run_update() {
-    echo "0%"
-    echo "1%"
-    bootc upgrade 2>&1
-    BOOTC_STATUS=${PIPESTATUS[0]}
-
-    if [ "$BOOTC_STATUS" -eq 0 ]; then
-      echo "100%"
-      exit 0
-    else
-      if [ "$BOOTC_STATUS" -eq 7 ]; then
-        exit 2
-      fi
-
-      exit "$BOOTC_STATUS"
+    if packages=$(package_updates); then
+        echo "Update available: $packages package update(s)"
+        exit 0
     fi
+    exit 7
 }
 
-COMMAND="$1"
+do_update() {
+    echo "0%"
+    online || { log "update: offline"; exit 2; }
+    echo "5%"
+    local rc
+    image_update > /dev/null; rc=$?
+    [ "$rc" = 2 ] && exit 2
+    echo "10%"
+    if [ "$rc" = 0 ]; then
+        # Downloads and stages the image, then prepares the package layers
+        # for it (the wrapper's after-image-staged). Reboot to use it.
+        logged bootc upgrade || exit 3
+        echo "100%"
+        exit 0
+    fi
+    if package_updates > /dev/null; then
+        echo "20%"
+        logged rum -y upgrade || exit 4
+    fi
+    echo "100%"
+    exit 0
+}
 
-case "$COMMAND" in
-    check) check_for_update ;;
-    update) run_update ;;
+case "${1:-}" in
+    check)  do_check ;;
+    update) do_update ;;
+    *)      echo "usage: $0 check|update" >&2; exit 1 ;;
 esac
-
-exit 7
