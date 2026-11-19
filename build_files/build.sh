@@ -78,7 +78,15 @@ rum install -y --skip-broken --skip-unavailable akonadi-server \
   jupiter-fan-control \
   jupiter-hw-support \
   steamdeck-dsp \
-  steamdeck-firmware
+  steamdeck-firmware \
+  steamos-manager
+
+# --skip-unavailable above would drop a missing package without failing the
+# build; these are the ones Gaming Mode on a handheld can't do without.
+for pkg in gamescope gamescope-session-steam inputplumber powerbuttond \
+    jupiter-hw-support jupiter-fan-control steamos-manager; do
+    rpm -q "$pkg" >/dev/null || { echo "ERROR: $pkg is not installed"; exit 1; }
+done
 
 ## Remove packages
 rum remove -y cardwire
@@ -91,4 +99,19 @@ systemctl enable pipewire-sysconf.service
 systemctl enable wireplumber-sysconf.service
 systemctl enable autologin-setup.service
 systemctl mask autologin-setup-plasma.service
-systemctl --global enable steamos-powerbuttond.service
+# Power button in Gaming Mode: gamescope-session-plus's device-quirks
+# (Steam Deck) blocks logind's power key handling and runs
+# /usr/bin/powerbuttond, which passes presses to Steam
+# (steam://shortpowerpress / longpowerpress). powerbuttond from SteamOS
+# (Terra) installs the daemon as /usr/lib/hwsupport/steamos-powerbuttond and
+# its user unit has no [Install] section, so enabling the unit did nothing
+# and no handler ran: point the name device-quirks looks for at it.
+test -x /usr/lib/hwsupport/steamos-powerbuttond \
+    || { echo "ERROR: /usr/lib/hwsupport/steamos-powerbuttond is missing"; exit 1; }
+ln -sf ../lib/hwsupport/steamos-powerbuttond /usr/bin/powerbuttond
+# SteamOS Manager: the D-Bus API Steam uses for SteamOS features. On the
+# Steam Deck it provides LowPowerMode1, which is what makes Steam offer
+# downloads with the display off (Settings > Power), plus TDP, GPU clock,
+# fan and battery charge limit controls. A system and a user service.
+systemctl enable steamos-manager.service
+systemctl --global enable steamos-manager.service
